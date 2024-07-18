@@ -1,6 +1,6 @@
 {
     "name": "@palisadeinc/identity-sdk",
-    "version": "1.0.0-alpha.1",
+    "version": "1.0.0-alpha.2",
     "description": "Palisade Identity SDK",
     "main": "src/index.js",
     "scripts": {
@@ -9,8 +9,7 @@
     },
     "author": "PalisadeInc",
     "license": "ISC",
-    "dependencies": {
-    },
+    "dependencies": {},
     "devDependencies": {
         "esbuild": "0.23.0"
     },
