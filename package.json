@@ -1,0 +1,25 @@
+{
+    "name": "@palisadeinc/identity-sdk",
+    "version": "1.0.0-alpha.1",
+    "description": "Palisade Identity SDK",
+    "main": "src/index.js",
+    "scripts": {
+        "build": "esbuild src/palisade-sdk.js --minify --outfile=dist/palisade-sdk.min.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "PalisadeInc",
+    "license": "ISC",
+    "dependencies": {
+    },
+    "devDependencies": {
+        "esbuild": "0.23.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/palisadeinc/identity-sdk.git"
+    },
+    "bugs": {
+        "url": "https://github.com/palisadeinc/identity-sdk/issues"
+    },
+    "homepage": "https://github.com/palisadeinc/identity-sdk#readme"
+}
