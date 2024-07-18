@@ -3,29 +3,29 @@ name: Publish npm package
 on:
   push:
     tags:
-      - 'v*.*.*-alpha.*'  # Triggers the workflow on alpha version tags
-      - 'v*.*.*'          # Triggers the workflow on version tags
+      - "v*.*.*-alpha.*" # Triggers the workflow on alpha version tags
+      - "v*.*.*" # Triggers the workflow on version tags
 
 jobs:
   publish:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'  # Use the Node.js version that your package requires
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 21
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Build package
-      run: npm run build  # Run your build script if you have one
+      - name: Build package
+        run: npm run build
 
-    - name: Publish to npm
-      run: npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
