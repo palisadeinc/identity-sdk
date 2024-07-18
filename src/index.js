@@ -1,14 +1,14 @@
 'use strict';
 
-class PalisadeIdentity {
+export class PalisadeIdentitySDK {
     static instance;
 
     constructor(clientConfig) {
-        if (PalisadeIdentity.instance) {
-            return PalisadeIdentity.instance;
+        if (PalisadeIdentitySDK.instance) {
+            return PalisadeIdentitySDK.instance;
         }
 
-        PalisadeIdentity.instance = this;
+        PalisadeIdentitySDK.instance = this;
 
         const environmentDomains = {
             development: "https://identity.development.palisade.co",
@@ -107,8 +107,8 @@ class PalisadeIdentity {
 
     utils = {
         closeModal: () => {
-            if (!!PalisadeIdentity.openedWindow) {
-                PalisadeIdentity.openedWindow.close();
+            if (!!PalisadeIdentitySDK.openedWindow) {
+                PalisadeIdentitySDK.openedWindow.close();
             }
         },
 
@@ -225,7 +225,7 @@ class PalisadeIdentity {
                             const data = await response.json();
                             this.clientConfig.onEvent({ ...eventObj.data, ...{ wallet: data }, eventCodes, eventMessages });
                             this.isConnected = true;
-                            PalisadeIdentity.instance.wallet = data;
+                            PalisadeIdentitySDK.instance.wallet = data;
                         })
                         .catch((error) => {
                             this.isConnected = false;
@@ -258,7 +258,7 @@ class PalisadeIdentity {
             const halfOfModalWidth = parseInt(this.sdkConfig.modal.width) / 2;
             const left = ((screen.width / 2) - halfOfModalWidth);
 
-            PalisadeIdentity.openedWindow = window.open(
+            PalisadeIdentitySDK.openedWindow = window.open(
                 `${this.sdkConfig.domain}?config=${configEncoded}`,
                 this.sdkConfig.modal.title,
                 `left=${left},top=${this.sdkConfig.modal.positionTop},width=${this.sdkConfig.modal.width},height=${this.sdkConfig.modal.height}`
