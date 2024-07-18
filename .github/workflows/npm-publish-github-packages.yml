@@ -4,8 +4,6 @@
 name: Publish Github package
 
 on:
-  release:
-    types: [published]
   push:
     tags:
       - "v*.*.*-alpha.*" # Triggers the workflow on alpha version tags
