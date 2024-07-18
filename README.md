@@ -1,4 +1,5 @@
 # identity-sdk
+
 JavaScript SDK for the Palisade Identity app integration, including a demo company integration
 
 <a id="readme-top"></a>
@@ -26,6 +27,7 @@ The **Palisade Identity JavaScript SDK** provides a set of tools and methods to 
 ## Browser Requirements
 
 The **Palisade Identity JavaScript SDK** makes use of modern browser API's including:
+
 - [Credential API](https://caniuse.com/mdn-api_credential)
 - [Window API](https://caniuse.com/mdn-api_window_open)
 
@@ -41,13 +43,13 @@ The **Palisade Identity JavaScript SDK** makes use of modern browser API's inclu
 Install the SDK via npm:
 
 ```bash
-npm install @palisadeinc/identity-sdk
+npm install https://github.com/palisadeinc/identity-sdk
 ```
 
 or via yarn:
 
 ```bash
-yarn add @palisadeinc/identity-sdk
+yarn add https://github.com/palisadeinc/identity-sdk
 ```
 
 ## Quick Start
@@ -55,16 +57,16 @@ yarn add @palisadeinc/identity-sdk
 Here's a simple example to get you started with the Palisade Identity SDK:
 
 ```javascript
-import PalisadeIdentity from '@palisadeinc/identity-sdk';
+import PalisadeIdentitySDK from "@palisadeinc/identity-sdk";
 
 // Initialize the SDK
-const palisade = new PalisadeIdentity({
-    clientId: 'YOUR_CLIENT_ID',
-    iconUrl: 'YOUR_ICON_URL_40x40'
+const palisade = new PalisadeIdentitySDK({
+  clientId: "YOUR_CLIENT_ID",
+  iconUrl: "YOUR_ICON_URL_40x40",
 });
 
 // Example: Connect
-palisade.connect()
+palisade.connect();
 ```
 
 ## Usage
@@ -74,38 +76,36 @@ palisade.connect()
 Before using any SDK functions, you must initialize it with your configuration:
 
 ```javascript
-import PalisadeIdentity from '@palisadeinc/identity-sdk';
+import PalisadeIdentitySdk from "@palisadeinc/identity-sdk";
 
-function onEvent (eventData) {
-
+function onEvent(eventData) {
   switch (eventData.code) {
-
     // Wallet connected
     case events.connectSuccess:
     case events.dappConnectedSuccessfully: {
-        // Wallet info:
-        console.log(eventData.wallet);
-        break;
+      // Wallet info:
+      console.log(eventData.wallet);
+      break;
     }
 
     // Transaction approved
     case events.transactionApprovedSuccessfully: {
-        // Do something...
-        break;
+      // Do something...
+      break;
     }
 
     // Transaction rejected
     case events.transactionRejectedSuccessfully: {
-        // Do something...
-        break;
+      // Do something...
+      break;
     }
   }
 }
 
-const palisade = new PalisadeIdentity({
-  clientId: 'YOUR_CLIENT_ID',
-  iconUrl: 'YOUR_ICON_URL_40x40',
-  onEvent
+const palisade = new PalisadeIdentitySDK({
+  clientId: "YOUR_CLIENT_ID",
+  iconUrl: "YOUR_ICON_URL_40x40",
+  onEvent,
 });
 ```
 
@@ -133,7 +133,7 @@ onEvent (eventData) {
 #### Disconnect
 
 ```javascript
-palisade.disconnect()
+palisade.disconnect();
 ```
 
 ### Transaction approval
@@ -141,7 +141,7 @@ palisade.disconnect()
 #### Sign
 
 ```javascript
-palisade.signTransaction(transactionHash);
+palisade.signTransaction(encodedTransaction);
 
 ...
 onEvent (eventData) {
@@ -166,7 +166,7 @@ onEvent (eventData) {
 #### Submit / Transfer
 
 ```javascript
-palisade.submitTransaction(transactionHash);
+palisade.submitTransaction(encodedTransaction);
 
 ...
 onEvent (eventData) {
