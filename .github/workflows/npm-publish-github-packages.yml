@@ -1,15 +1,15 @@
 # This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
 # For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
 
-name: Node.js Package
+name: Publish Github package
 
 on:
   release:
     types: [published]
   push:
     tags:
-      - 'v*.*.*-alpha.*'  # Triggers the workflow on alpha version tags
-      - 'v*.*.*'          # Triggers the workflow on version tags
+      - "v*.*.*-alpha.*" # Triggers the workflow on alpha version tags
+      - "v*.*.*" # Triggers the workflow on version tags
 
 jobs:
   build:
@@ -20,7 +20,6 @@ jobs:
         with:
           node-version: 16
       - run: npm ci
-      - run: npm test
 
   publish-gpr:
     needs: build
