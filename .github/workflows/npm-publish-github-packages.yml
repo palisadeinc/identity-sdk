@@ -33,6 +33,9 @@ jobs:
           registry-url: https://npm.pkg.github.com/
       - run: echo $NPM_GITHUB_TOKEN
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Build package
         run: npm run build
 
