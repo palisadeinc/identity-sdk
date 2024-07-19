@@ -76,7 +76,7 @@ palisade.connect();
 Before using any SDK functions, you must initialize it with your configuration:
 
 ```javascript
-import PalisadeIdentitySdk from "@palisadeinc/identity-sdk";
+import PalisadeIdentitySDK from "@palisadeinc/identity-sdk";
 
 function onEvent(eventData) {
   switch (eventData.code) {
