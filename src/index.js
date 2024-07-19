@@ -78,7 +78,7 @@ export class PalisadeIdentitySDK {
                 'PAL.ERROR.106': 'JWT is not authenticated so the app has disconnected'
             },
             eventCodes: {
-                dappConnectedSuccessfully: 'PAL.EVENT.101'
+                dappReconnectedSuccessfully: 'PAL.EVENT.101'
             },
             eventMessages: {
                 'PAL.EVENT.101': 'Dapp has connected successfully',
@@ -482,7 +482,7 @@ export class PalisadeIdentitySDK {
         }
 
         const data = await response.json();
-        this.clientConfig.onEvent({ code: this.sdkConfig.eventCodes.dappConnectedSuccessfully, ...{ wallet: data }}, this.sdkConfig.eventCodes, this.sdkConfig.eventMessages);
+        this.clientConfig.onEvent({ code: this.sdkConfig.eventCodes.dappReconnectedSuccessfully, ...{ wallet: data }}, this.sdkConfig.eventCodes, this.sdkConfig.eventMessages);
         this.wallet = data;
     }
 }

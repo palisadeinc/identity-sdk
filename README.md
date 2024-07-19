@@ -79,23 +79,25 @@ Before using any SDK functions, you must initialize it with your configuration:
 import PalisadeIdentitySDK from "@palisadeinc/identity-sdk";
 
 function onEvent(eventData) {
+  const eventCodes = palisade.getEvents();
+
   switch (eventData.code) {
-    // Wallet connected
-    case events.connectSuccess:
-    case events.dappConnectedSuccessfully: {
+    // Wallet connected / reconnected
+    case eventCodes.connectSuccess:
+    case eventCodes.dappReconnectedSuccessfully: {
       // Wallet info:
       console.log(eventData.wallet);
       break;
     }
 
     // Transaction approved
-    case events.transactionApprovedSuccessfully: {
+    case eventCodes.transactionApprovedSuccessfully: {
       // Do something...
       break;
     }
 
     // Transaction rejected
-    case events.transactionRejectedSuccessfully: {
+    case eventCodes.transactionRejectedSuccessfully: {
       // Do something...
       break;
     }
@@ -118,10 +120,13 @@ palisade.connect()
 
 ...
 onEvent (eventData) {
+
+  const eventCodes = palisade.getEvents();
+
   switch (eventData.code) {
 
     // Connected successfully
-    case events.connectSuccess: {
+    case eventCodes.connectSuccess: {
         console.log(eventData.wallet);
         break;
     }
