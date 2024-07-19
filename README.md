@@ -62,7 +62,7 @@ import PalisadeIdentitySDK from "@palisadeinc/identity-sdk";
 // Initialize the SDK
 const palisade = new PalisadeIdentitySDK({
   clientId: "YOUR_CLIENT_ID",
-  iconUrl: "YOUR_ICON_URL_40x40",
+  iconUrl: "https://placehold.co/40x40",
 });
 
 // Example: Connect
@@ -106,7 +106,7 @@ function onEvent(eventData) {
 
 const palisade = new PalisadeIdentitySDK({
   clientId: "YOUR_CLIENT_ID",
-  iconUrl: "YOUR_ICON_URL_40x40",
+  iconUrl: "https://placehold.co/40x40",
   onEvent,
 });
 ```
