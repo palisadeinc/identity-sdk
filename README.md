@@ -43,13 +43,13 @@ The **Palisade Identity JavaScript SDK** makes use of modern browser API's inclu
 Install the SDK via npm:
 
 ```bash
-npm install https://github.com/palisadeinc/identity-sdk
+npm install @palisadeinc/identity-sdk
 ```
 
 or via yarn:
 
 ```bash
-yarn add https://github.com/palisadeinc/identity-sdk
+yarn add @palisadeinc/identity-sdk
 ```
 
 ## Quick Start
