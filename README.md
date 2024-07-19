@@ -57,7 +57,7 @@ yarn add @palisadeinc/identity-sdk
 Here's a simple example to get you started with the Palisade Identity SDK:
 
 ```javascript
-import PalisadeIdentitySDK from "@palisadeinc/identity-sdk";
+import { PalisadeIdentitySDK } from "@palisadeinc/identity-sdk";
 
 // Initialize the SDK
 const palisade = new PalisadeIdentitySDK({
@@ -76,7 +76,7 @@ palisade.connect();
 Before using any SDK functions, you must initialize it with your configuration:
 
 ```javascript
-import PalisadeIdentitySDK from "@palisadeinc/identity-sdk";
+import { PalisadeIdentitySDK } from "@palisadeinc/identity-sdk";
 
 function onEvent(eventData) {
   const eventCodes = palisade.getEvents();
