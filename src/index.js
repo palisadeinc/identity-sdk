@@ -379,7 +379,7 @@ export class PalisadeIdentitySDK {
                     }
 
                     this.emit('transaction-approved', {
-                        encodedTx: eventObj.data.encodedTransaction,
+                        encodedTransaction: eventObj.data.encodedTransaction,
                         signature: eventObj.data.signature,
                         transactionId: eventObj.data.transactionId
                     });
