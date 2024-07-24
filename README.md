@@ -15,9 +15,14 @@ Welcome to the **Palisade Identity JavaScript SDK** repository. This SDK enables
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Usage](#usage)
-- [API Reference](#api-reference)
-- [Contributing](#contributing)
-- [License](#license)
+- [Methods](#methods)
+  - [signTransaction](#signTransaction)
+  - [submitTransaction](#submitTransaction)
+- [Events](#events)
+  - [connected](#connected)
+  - [disconnected](#disconnected)
+  - [tx-approved](#txApproved)
+  - [tx-rejected](#txRejected)
 - [Contact](#contact)
 
 ## Introduction
@@ -65,7 +70,7 @@ const palisade = new PalisadeIdentitySDK({
   iconUrl: "https://placehold.co/40x40",
 });
 
-// Example: Connect
+// Call the connect method to initiate the create wallet / login flow
 palisade.connect();
 ```
 
@@ -78,119 +83,160 @@ Before using any SDK functions, you must initialize it with your configuration:
 ```javascript
 import { PalisadeIdentitySDK } from "@palisadeinc/identity-sdk";
 
-function onEvent(eventData) {
-  const eventCodes = palisade.getEvents();
-
-  switch (eventData.code) {
-    // Wallet connected / reconnected
-    case eventCodes.connectSuccess:
-    case eventCodes.dappReconnectedSuccessfully: {
-      // Wallet info:
-      console.log(eventData.wallet);
-      break;
-    }
-
-    // Transaction approved
-    case eventCodes.transactionApprovedSuccessfully: {
-      // Do something...
-      break;
-    }
-
-    // Transaction rejected
-    case eventCodes.transactionRejectedSuccessfully: {
-      // Do something...
-      break;
-    }
-  }
-}
-
 const palisade = new PalisadeIdentitySDK({
   clientId: "YOUR_CLIENT_ID",
   iconUrl: "https://placehold.co/40x40",
-  onEvent,
 });
+
+// User creates or connects their Palisade wallet
+palisade.on("connected", () => {});
+
+// User disconnects their Palisade wallet
+palisade.on("disconnected", () => {});
+
+// User approves a transaction
+palisade.on("tx-approved", (data) => {
+  console.log(data.signature, data.id, data.encodedTx);
+});
+
+// User has disconnected their Palisade wallet
+palisade.on("tx-approved", () => {});
 ```
 
-### Authentication
+# Methods
 
-#### Connect
+<a id="signTransaction"></a>
 
-```javascript
-palisade.connect()
+### Method: `palisade.signTransaction(encodedTransaction)`
 
-...
-onEvent (eventData) {
+This method is used to initiate the process of signing a transaction. It opens a window to allow the user to use their passkey to approve the transaction.
 
-  const eventCodes = palisade.getEvents();
+#### Parameters
 
-  switch (eventData.code) {
+- **encodedTransaction**: `string` - The encoded representation of the transaction that needs to be signed.
 
-    // Connected successfully
-    case eventCodes.connectSuccess: {
-        console.log(eventData.wallet);
-        break;
-    }
-  }
-}
-...
-```
+#### Description
 
-#### Disconnect
+When `palisade.signTransaction(encodedTransaction)` is called, a window is opened where the user can use their passkey to approve the transaction. This method initiates the user authentication and approval process, ensuring the transaction is signed securely.
+
+#### Example
+
+To sign a transaction, call the `palisade.signTransaction` method with the encoded transaction data as the parameter. Here's an example of how to do it:
 
 ```javascript
-palisade.disconnect();
-```
+const encodedTransaction = "base64encodedtransactiondata";
 
-### Transaction approval
-
-#### Sign
-
-```javascript
 palisade.signTransaction(encodedTransaction);
-
-...
-onEvent (eventData) {
-  switch (eventData.code) {
-
-    // Transaction approved
-    case events.transactionApprovedSuccessfully: {
-        // Do something...
-        break;
-    }
-
-    // Transaction rejected
-    case events.transactionRejectedSuccessfully: {
-        // Do something...
-        break;
-    }
-  }
-}
-...
 ```
 
-#### Submit / Transfer
+In this example, an encoded transaction is passed to the `signTransaction` method. The user is then prompted to use their passkey to approve the transaction, completing the signing process.
+
+<a id="submitTransaction"></a>
+
+### Method: `palisade.submitTransaction(encodedTransaction)`
+
+This method is used to submit a transaction to the network. It takes the encoded transaction data as a parameter and sends it for processing.
+
+#### Usage
+
+To submit a transaction, call the `palisade.submitTransaction` method with the encoded transaction data as the parameter. Here's an example of how to do it:
 
 ```javascript
 palisade.submitTransaction(encodedTransaction);
+```
 
-...
-onEvent (eventData) {
-  switch (eventData.code) {
+#### Parameters
 
-    // Transaction approved
-    case events.transactionApprovedSuccessfully: {
-        // Do something...
-        break;
-    }
+- **encodedTransaction**: `string` - The encoded representation of the transaction that needs to be submitted.
 
-    // Transaction rejected
-    case events.transactionRejectedSuccessfully: {
-        // Do something...
-        break;
-    }
-  }
-}
-...
+#### Description
+
+When `palisade.submitTransaction(encodedTransaction)` is called, the provided encoded transaction data is submitted to the network for processing. This method handles the necessary steps to ensure the transaction is correctly sent and processed by the network.
+
+#### Example
+
+To submit a transaction, call the `palisade.submitTransaction` method with the encoded transaction data as the parameter. Here's an example of how to do it:
+
+```javascript
+const encodedTransaction = "base64encodedtransactiondata";
+
+palisade.submitTransaction(encodedTransaction);
+```
+
+## Events
+
+<a id="connected"></a>
+
+### Event: `connected`
+
+This event is triggered when the connection to the Palisade service is successfully established. It does not provide any additional data, as it simply indicates the successful connection.
+
+#### Example
+
+To handle the `connected` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
+
+```javascript
+palisade.on("connected", () => {
+  console.log("Successfully connected to Palisade service.");
+});
+```
+
+<a id="disconnected"></a>
+
+### Event: `disconnected`
+
+This event is triggered when the connection to the Palisade service is lost. It does not provide any additional data, as it simply indicates the disconnection.
+
+#### Example
+
+To handle the `disconnected` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
+
+```javascript
+palisade.on("disconnected", () => {
+  console.log("Disconnected from Palisade service.");
+});
+```
+
+<a id="txApproved"></a>
+
+### Event: `tx-approved`
+
+This event is triggered when a user approves a transaction. It provides detailed information about the approved transaction including the signature, transaction ID, and the encoded transaction data.
+
+#### Event Data Structure
+
+The event handler receives a `data` object with the following properties:
+
+- **signature**: `string` - The cryptographic signature of the transaction.
+- **id**: `string` - The unique identifier of the transaction.
+- **encodedTx**: `string` - The encoded representation of the transaction.
+
+#### Example
+
+To handle the `tx-approved` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
+
+```javascript
+palisade.on("tx-approved", (data) => {
+  console.log("Transaction Signature:", data.signature);
+  console.log("Transaction ID:", data.id);
+  console.log("Encoded Transaction:", data.encodedTx);
+});
+```
+
+<a id="txRejected"></a>
+
+### Event: `tx-rejected`
+
+This event is triggered when a user rejects a transaction. It does not provide any additional data, as it simply indicates the rejection action.
+
+#### Usage
+
+To handle the `tx-rejected` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
+
+```javascript
+palisade.on("tx-rejected", () => {
+  console.log("Transaction was rejected by the user.");
+});
 ```
 
 ## Contact

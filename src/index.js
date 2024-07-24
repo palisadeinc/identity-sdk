@@ -1,5 +1,64 @@
 'use strict';
 
+class EventEmitter {
+    constructor(validEvents) {
+        this.eventListeners = {};
+        this.validEvents = validEvents;
+    }
+
+    #isValidEvent(eventName) {
+        return this.validEvents.includes(eventName);
+    }
+
+    // Register an event listener
+    on(eventName, callback) {
+        if (!this.#isValidEvent(eventName)) {
+            throw new Error(`Invalid event name: ${eventName}`);
+        }
+
+        if (typeof eventName !== 'string') {
+            throw new Error('Unable to register event: eventName must be a string');
+        }
+
+        if (typeof callback !== 'function') {
+            throw new Error('Unable to register event: callback must be a function');
+        }
+
+        if (!this.eventListeners[eventName]) {
+            this.eventListeners[eventName] = [];
+        }
+        
+        this.eventListeners[eventName].push(callback);
+    }
+
+    // Remove an event listener
+    off(eventName) {
+        if (!this.#isValidEvent(eventName)) {
+            throw new Error(`Invalid event name: ${eventName}`);
+        }
+        
+        if (!this.eventListeners[eventName]) return;
+
+        delete(this.eventListeners[eventName]);
+    }
+
+    // Emit an event
+    emit(eventName, data) {
+        if (!this.#isValidEvent(eventName)) {
+            throw new Error(`Invalid event name: ${eventName}`);
+        }
+
+        this.eventListeners[eventName].forEach(listener => {
+            listener(data)
+        });
+    }
+
+    // Remove all event listeners
+    destroy() {
+        this.eventListeners = [];
+    }
+}
+
 export class PalisadeIdentitySDK {
     static instance;
 
@@ -66,8 +125,7 @@ export class PalisadeIdentitySDK {
                 unableToGetWallet: 'PAL.ERROR.103',
                 unableToSignTransaction: 'PAL.ERROR.104',
                 unableToSubmitTransaction: 'PAL.ERROR.105',
-                jwtNotAuthenticated: 'PAL.ERROR.106',
-				unableToGetTransaction: 'PAL.ERROR.107'
+                jwtNotAuthenticated: 'PAL.ERROR.106'
             },
             errorMessages: {
                 'PAL.ERROR.101': 'You need to connect before you can approve a transaction',
@@ -76,12 +134,6 @@ export class PalisadeIdentitySDK {
                 'PAL.ERROR.104': 'Unable to sign transaction',
                 'PAL.ERROR.105': 'Unable to submit transaction',
                 'PAL.ERROR.106': 'JWT is not authenticated so the app has disconnected'
-            },
-            eventCodes: {
-                dappReconnectedSuccessfully: 'PAL.EVENT.101'
-            },
-            eventMessages: {
-                'PAL.EVENT.101': 'Dapp has connected successfully',
             }
         };
 
@@ -89,23 +141,138 @@ export class PalisadeIdentitySDK {
             domain: window.location.origin,
             environment: !!clientConfig.environment ? clientConfig.environment : 'DEV'
         }};
-        this.isConnected = this.getIsConnected();
+
+        this.isConnected = this.#getIsConnected();
         this.wallet = null;
 		this.transactionId = null;
 
-        const validationResponse = this.validateClientConfig(clientConfig);
+        const publicEventNames = [
+            'connected',
+            'disconnected',
+            'tx-approved',
+            'tx-rejected',
+        ];
+
+        this.publicEvents = new EventEmitter(publicEventNames);
+        this.publicEventNames = publicEventNames;
+
+        this.#initialiseMessageEventListener();
+
+        const validationResponse = this.#validateClientConfig(clientConfig);
 
         if (!validationResponse.isValid) {
-            this.utils.onError(validationResponse.errorCode);
+            this.#utils.onError(validationResponse.errorCode);
             return;
         }
 
         if (this.isConnected) {
-            this.loadWallet();
+            this.#loadWallet();
         }
     }
 
-    utils = {
+    // Private methods
+    async #getWallet() {
+        const url = `${this.sdkConfig.apiUri}/v1/connection/wallets`;
+        const authToken = this.#getAuthCookie();
+
+        if (!authToken) {
+            this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
+            return;
+        }
+
+        return fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            },
+            method: 'GET'
+        });
+    }
+
+    async #loadWallet() {
+        const response = await this.#getWallet();
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                this.#utils.onError(this.sdkConfig.errorCodes.jwtNotAuthenticated);
+                this.disconnect();
+                return;
+            }
+
+            this.#utils.onError(this.sdkConfig.errorCodes.unableToGetWallet);
+            return;
+        }
+
+        const walletObj = await response.json();
+
+        this.emit('connected', walletObj);
+        this.isConnected = true;
+        this.wallet = walletObj;
+    }
+
+    #api = {
+        signTransaction: async (rawTransactionHash) => {
+            const url = `${this.sdkConfig.apiUri}/v1/connection/signatures`;
+            const authToken = this.#getAuthCookie();
+
+            if (!authToken) {
+                this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
+                return;
+            }
+
+            return fetch(url, this.#utils.withAuthToken({
+                body: JSON.stringify({ data: rawTransactionHash }),
+                method: 'POST'
+            }));
+        },
+        submitTransaction: async (rawTransactionHash) => {
+            const url = `${this.sdkConfig.apiUri}/v1/connection/transactions`;
+            const authToken = this.#getAuthCookie();
+
+            if (!authToken) {
+                this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
+                return;
+            }
+
+            return fetch(url, this.#utils.withAuthToken({
+                body: JSON.stringify({ data: rawTransactionHash }),
+                method: 'POST'
+            }));
+        }
+    };
+
+    #getAuthCookie() {
+        return this.#utils.getCookieValue(this.sdkConfig.authCookieName);
+    }
+
+    #getIsConnected() {
+        return !!this.#getAuthCookie(this.sdkConfig.authCookieName);
+    }
+
+    #initialiseMessageEventListener() {
+        
+        window.addEventListener('message', (event) => {
+            if (event.origin !== this.sdkConfig.domain) {
+                return;
+            }
+
+            switch (event.data.type) {
+                case 'ERROR': {
+                    this.#utils.onError(event.data.code, event.data.errorMessages);
+                    break;
+                }
+                case 'EVENT': {
+                    this.#utils.onEvent(event);
+                    break;
+                }
+                case 'LOG': {
+                    this.#utils.onLog(event);
+                    break;
+                }
+            }
+        });
+    }
+
+    #utils = {
         closeModal: () => {
             if (!!PalisadeIdentitySDK.openedWindow) {
                 PalisadeIdentitySDK.openedWindow.close();
@@ -118,26 +285,9 @@ export class PalisadeIdentitySDK {
         },
 
         deleteCookie: (cname, cvalue, exdays) => {
-            if (this.utils.getCookieValue(cname)) {
-                this.utils.setCookie(cname, undefined, -10);
+            if (this.#utils.getCookieValue(cname)) {
+                this.#utils.setCookie(cname, undefined, -10);
             }
-        },
-
-        truncateWithCenterEllipsis: (string, truncateLength = 5) => {
-            const prefixSuffixLength = truncateLength;
-            const stringLength = string.length;
-
-            if (stringLength <= prefixSuffixLength * 2) {
-                return string;
-            }
-
-            const prefix = string.substring(0, prefixSuffixLength);
-            const suffix = string.substring(
-                stringLength - prefixSuffixLength,
-                stringLength
-            );
-
-            return `${prefix}...${suffix}`;
         },
 
         getCookieValue: (cname) => {
@@ -161,31 +311,11 @@ export class PalisadeIdentitySDK {
             return document.body.querySelector(`#${this.clientConfig.placeholder.wallet} [data-palisade='${elementAttr}']`);
         },
 
-        initialiseMessageEventListener: () => {
-            window.addEventListener('message', (event) => {
-                if (event.origin === this.sdkConfig.domain) {
-                    switch (event.data.type) {
-                        case 'ERROR': {
-                            this.utils.onError(event.data.code, event.data.errorMessages);
-                            break;
-                        }
-                        case 'EVENT': {
-                            this.utils.onEvent(event);
-                            break;
-                        }
-                        case 'LOG': {
-                            this.utils.onLog(event);
-                            break;
-                        }
-                    }
-                }
-            });
-        },
-
         isValidString: (value) => {
             return typeof value === 'string';
         },
 
+        // TODO: Move to emit / subscribe model
         onError: (errorCode, errorMessages) => {
             if (typeof this.clientConfig.onError === 'function') {
                 this.clientConfig.onError(errorCode, { errorMessages, ...this.sdkConfig.errorMessages });
@@ -203,48 +333,67 @@ export class PalisadeIdentitySDK {
 
         onEvent: (eventObj) => {
 
-            // TODO: Validate these exist
-            const eventCodes = eventObj.data.codes.event;
-            const eventMessages = eventObj.data.messages.event;
+            // TODO: Validate eventCodes with returned event codes to flag in case any have changed
+            const eventCodes = {
+                connected: 'PAL.EVENT.001',
+                txApproved: 'PAL.EVENT.002',
+                txRejected: 'PAL.EVENT.003',
+                loggedIn: 'PAL.EVENT.004',
+                registered: 'PAL.EVENT.005',
+                passkeyLoginCancelled: 'PAL.EVENT.006',
+                passkeyRegistrationCancelled: 'PAL.EVENT.007'
+            };
 
             switch (eventObj.data.code) {
-                case eventCodes.messagesCreatedSuccessfully: {
-                    break;
-                }
 
-                case eventCodes.connectSuccess: {
+                case eventCodes.connected: {
                     if (!eventObj.data || !eventObj.data.token) {
                         console.error(`No token defined in ${eventObj.code} response`);
                         return;
                     }
 
-                    this.utils.setCookie(this.sdkConfig.authCookieName, eventObj.data.token, this.sdkConfig.cookieExpiryDays);
+                    this.#utils.setCookie(this.sdkConfig.authCookieName, eventObj.data.token, this.sdkConfig.cookieExpiryDays);
 
-                    this.getWallet()
+                    this.#getWallet()
                         .then(async (response) => {
-                            const data = await response.json();
-                            this.clientConfig.onEvent({ ...eventObj.data, ...{ wallet: data }, eventCodes, eventMessages });
+                            const walletObj = await response.json();
+                            this.emit('connected', walletObj);
                             this.isConnected = true;
-                            PalisadeIdentitySDK.instance.wallet = data;
+                            PalisadeIdentitySDK.instance.wallet = walletObj;
                         })
                         .catch((error) => {
                             this.isConnected = false;
-                            this.utils.onError(this.sdkConfig.errorCodes.unableToGetWallet);
+                            this.#utils.onError(this.sdkConfig.errorCodes.unableToGetWallet);
                             console.error(error);
                         });
 
-                    return;
+                    break;
                 }
-            }
 
-            if (typeof this.clientConfig.onEvent === 'function') {
-                this.clientConfig.onEvent(eventObj.data, eventCodes, eventMessages);
-            }
-            else {
-                console.log(eventObj.data);
+                case eventCodes.txApproved: {
+
+                    // Tentative error surfacing
+                    // TODO: Review whether these fields can actually be undefined
+                    if (!eventObj.data || !eventObj.data.encodedTransaction || !eventObj.data.signature || !eventObj.data.transactionId) {
+                        console.error(`Tx details are not correctly defined`);
+                    }
+
+                    this.emit('tx-approved', {
+                        encodedTx: eventObj.data.encodedTransaction,
+                        signature: eventObj.data.signature,
+                        txId: eventObj.data.transactionId
+                    });
+
+                    break;
+                }
+
+                case eventCodes.txRejected: {
+                    this.emit('tx-rejected');
+                }
             }
         },
 
+        // TODO: Move to emit / subscribe model
         onLog: (logCode, logMessages) => {
             if (this.clientConfig.onLog) {
                 this.clientConfig.onLog(logCode, logMessages);
@@ -270,118 +419,125 @@ export class PalisadeIdentitySDK {
             d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
             let expires = "expires=" + d.toUTCString();
             document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        },
+
+        truncateWithCenterEllipsis: (string, truncateLength = 5) => {
+            const prefixSuffixLength = truncateLength;
+            const stringLength = string.length;
+
+            if (stringLength <= prefixSuffixLength * 2) {
+                return string;
+            }
+
+            const prefix = string.substring(0, prefixSuffixLength);
+            const suffix = string.substring(
+                stringLength - prefixSuffixLength,
+                stringLength
+            );
+
+            return `${prefix}...${suffix}`;
+        },
+
+        withAuthToken: (requestConfig) => {
+
+            const authToken = this.#getAuthCookie();
+     
+            if (!authToken) {
+                this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
+                return;
+            }
+
+            return {
+                ...requestConfig,
+                headers: {
+                    ...requestConfig.headers,
+                    'Authorization': `Bearer ${authToken}`
+                },
+
+            }
         }
     };
 
-    api = {
-		getTransaction: async (transactionId) => {
-
-			// TODO: Add check in for transactionId
-
-            const url = `${this.sdkConfig.apiUri}/v1/connection/transactions/${transactionId}`;
-            const authToken = this.getAuthCookie();
-
-            if (!authToken) {
-                this.utils.onError(this.sdkConfig.errorCodes.noAuthToken);
-                return;
-            }
-
-            return fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                },
-                method: 'GET'
-            });
-        },
-        signTransaction: async (rawTransactionHash) => {
-            const url = `${this.sdkConfig.apiUri}/v1/connection/signatures`;
-            const authToken = this.getAuthCookie();
-
-            if (!authToken) {
-                this.utils.onError(this.sdkConfig.errorCodes.noAuthToken);
-                return;
-            }
-
-            return fetch(url, {
-                body: JSON.stringify({ data: rawTransactionHash }),
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                },
-                method: 'POST'
-            });
-        },
-        submitTransaction: async (rawTransactionHash) => {
-            const url = `${this.sdkConfig.apiUri}/v1/connection/transactions`;
-            const authToken = this.getAuthCookie();
-
-            if (!authToken) {
-                this.utils.onError(this.sdkConfig.errorCodes.noAuthToken);
-                return;
-            }
-
-            return fetch(url, {
-                body: JSON.stringify({ data: rawTransactionHash }),
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                },
-                method: 'POST'
-            });
-        }
-    };
-
-    async getTransaction(transactionId) {
-
-        const response = await this.api.getTransaction(transactionId);
-
-        if (!response.ok) {
-            this.utils.onError(this.sdkConfig.errorCodes.unableToGetTransaction);
-            return;
+    #validateClientConfig(clientConfig) {
+        if (!this.#utils.isValidString(clientConfig.clientId)) {
+            return {
+                isValid: false,
+                errorCode: 'PAL.ERROR.003'
+            };
         }
 
-        const data = await response.json();
-
-        console.table(data);
-    }
-
-    async submitTransaction(rawTransactionHash) {
-        if (!this.isConnected) {
-            this.utils.onError(this.sdkConfig.errorCodes.notConnected);
-            return;
-        }
-
-        const response = await this.api.submitTransaction(rawTransactionHash);
-
-        if (!response.ok) {
-            this.utils.onError(this.sdkConfig.errorCodes.unableToSubmitTransaction);
-            return;
-        }
-
-        const data = await response.json();
-
-		this.transactionId = data.ID;
-
-        const clientConfig = {
-            ...this.clientConfig,
-            ...{ transactionId: this.transactionId },
-            ...{ action: this.sdkConfig.actions.approveTransaction }
+        return {
+            isValid: true
         };
-
-        const clientConfigAsBase64 = this.utils.convertJsonToBase64String(clientConfig);
-		//this.getTransaction(this.transactionId);
-        this.utils.openModal(clientConfigAsBase64);
-        this.utils.initialiseMessageEventListener();
     }
 
+    // Public methods
+    /**
+     * Triggers the Palisade connection flow
+     * Requires a valid clientConfig to have been initialized
+     */
+    connect() {
+        const clientConfigAsBase64 = this.#utils.convertJsonToBase64String(this.clientConfig);
+        this.#utils.openModal(clientConfigAsBase64);
+    }
+
+    /**
+     * Removes all event listeners on the publicEvents listener array.
+     */
+    destroy() {
+        this.publicEvents.length = 0;
+    }
+
+    /**
+     * Disconnects the palisade wallet, clearing the JWT token
+     */
+    disconnect() {
+        this.#utils.deleteCookie(this.sdkConfig.authCookieName);
+        this.isConnected = false;
+        this.emit('disconnected', null);
+    }
+
+    /**
+     * Emits an event on the publicEvents listener array.
+     * @param {string} eventName 
+     * @param {any} data 
+     */
+    emit(eventName, data) {
+        this.publicEvents.emit(eventName, data);
+    }
+
+    /**
+     * Clear a specific listener on the publicEvents listener array.
+     * @param {string} eventName // Must exist in the publicEventNames array
+     */
+    off(eventName) {
+        this.publicEvents.off(eventName);
+    }
+
+    /**
+     * Adds an event listener to the publicEvents listener array.
+     * @param {string} eventName // Must exist in the publicEventNames array
+     * @param {function} callback
+     */
+    on(eventName, callback) {
+        this.publicEvents.on(eventName, callback);
+    }
+
+    /**
+     * Triggers the signing flow to submit / transfer a transaction via the Identity UI
+     * @param {string} rawTransactionHash 
+     * @returns 
+     */
     async signTransaction(rawTransactionHash) {
         if (!this.isConnected) {
-            this.utils.onError(this.sdkConfig.errorCodes.notConnected);
+            this.#utils.onError(this.sdkConfig.errorCodes.notConnected);
             return;
         }
 
-        const response = await this.api.signTransaction(rawTransactionHash);
+        const response = await this.#api.signTransaction(rawTransactionHash);
 
         if (!response.ok) {
-            this.utils.onError(this.sdkConfig.errorCodes.unableToSignTransaction);
+            this.#utils.onError(this.sdkConfig.errorCodes.unableToSignTransaction);
             return;
         }
 
@@ -395,94 +551,47 @@ export class PalisadeIdentitySDK {
             ...{ action: this.sdkConfig.actions.approveTransaction }
         };
 
-        const clientConfigAsBase64 = this.utils.convertJsonToBase64String(clientConfig);
+        const clientConfigAsBase64 = this.#utils.convertJsonToBase64String(clientConfig);
 
-		//this.getTransaction(this.transactionId);
-        this.utils.openModal(clientConfigAsBase64);
-        this.utils.initialiseMessageEventListener();
+        this.#utils.openModal(clientConfigAsBase64);
     }
 
-    connect() {
-        const clientConfigAsBase64 = this.utils.convertJsonToBase64String(this.clientConfig);
-        this.utils.openModal(clientConfigAsBase64);
-        this.utils.initialiseMessageEventListener();
-    }
-
-    disconnect() {
-        this.utils.deleteCookie(this.sdkConfig.authCookieName);
-        this.isConnected = false;
-    }
-
-    getAuthCookie() {
-        return this.utils.getCookieValue(this.sdkConfig.authCookieName);
-    }
-
-    getEvents() {
-        return {
-            walletConnectedSuccessfully: 'PAL.EVENT.001',
-            transactionApprovedSuccessfully: 'PAL.EVENT.002',
-            transactionApprovalRejected: 'PAL.EVENT.003',
-            loginSuccess: 'PAL.EVENT.004',
-            registrationSuccess: 'PAL.EVENT.005',
-            passkeyLoginCancelled: 'PAL.EVENT.006',
-            passkeyRegistrationCancelled: 'PAL.EVENT.007',
-            connectSuccess: 'PAL.EVENT.008',
-            walletLoaded: 'PAL.EVENT.009',
-            messagesCreatedSuccessfully: 'PAL.EVENT.010',
-            ...this.sdkConfig.eventCodes
-        };
-    }
-
-    getIsConnected() {
-        return !!this.getAuthCookie(this.sdkConfig.authCookieName);
-    }
-
-    async getWallet() {
-        const url = `${this.sdkConfig.apiUri}/v1/connection/wallets`;
-        const authToken = this.getAuthCookie();
-
-        if (!authToken) {
-            this.utils.onError(this.sdkConfig.errorCodes.noAuthToken);
+    /**
+     * Triggers the approval flow to submit / transfer a transaction via the Identity UI
+     * @param {string} rawTransactionHash 
+     * @returns 
+     */
+    async submitTransaction(rawTransactionHash) {
+        if (!this.isConnected) {
+            this.#utils.onError(this.sdkConfig.errorCodes.notConnected);
             return;
         }
 
-        return fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            },
-            method: 'GET'
-        });
-    }
-
-    validateClientConfig(clientConfig) {
-        if (!this.utils.isValidString(clientConfig.clientId)) {
-            return {
-                isValid: false,
-                errorCode: 'PAL.ERROR.003'
-            };
-        }
-
-        return {
-            isValid: true
-        };
-    }
-
-    async loadWallet() {
-        const response = await this.getWallet();
+        const response = await this.#api.submitTransaction(rawTransactionHash);
 
         if (!response.ok) {
-            if (response.status === 401) {
-                this.utils.onError(this.sdkConfig.errorCodes.jwtNotAuthenticated);
-                this.disconnect();
-                return;
-            }
-
-            this.utils.onError(this.sdkConfig.errorCodes.unableToGetWallet);
+            this.#utils.onError(this.sdkConfig.errorCodes.unableToSubmitTransaction);
             return;
         }
 
         const data = await response.json();
-        this.clientConfig.onEvent({ code: this.sdkConfig.eventCodes.dappReconnectedSuccessfully, ...{ wallet: data }}, this.sdkConfig.eventCodes, this.sdkConfig.eventMessages);
-        this.wallet = data;
+
+		this.transactionId = data.ID;
+
+        const clientConfig = {
+            ...this.clientConfig,
+            ...{ transactionId: this.transactionId },
+            ...{ action: this.sdkConfig.actions.approveTransaction }
+        };
+
+        const clientConfigAsBase64 = this.#utils.convertJsonToBase64String(clientConfig);
+        this.#utils.openModal(clientConfigAsBase64);
+    }
+
+    /**
+     * Publicly expose any util functions that might be useful
+     */
+    utils = {
+        truncateWithCenterEllipsis: this.#utils.truncateWithCenterEllipsis
     }
 }
