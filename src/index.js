@@ -149,8 +149,8 @@ export class PalisadeIdentitySDK {
         const publicEventNames = [
             'connected',
             'disconnected',
-            'tx-approved',
-            'tx-rejected',
+            'transaction-approved',
+            'transaction-rejected',
         ];
 
         this.publicEvents = new EventEmitter(publicEventNames);
@@ -336,8 +336,8 @@ export class PalisadeIdentitySDK {
             // TODO: Validate eventCodes with returned event codes to flag in case any have changed
             const eventCodes = {
                 connected: 'PAL.EVENT.001',
-                txApproved: 'PAL.EVENT.002',
-                txRejected: 'PAL.EVENT.003',
+                transactionApproved: 'PAL.EVENT.002',
+                transactionRejected: 'PAL.EVENT.003',
                 loggedIn: 'PAL.EVENT.004',
                 registered: 'PAL.EVENT.005',
                 passkeyLoginCancelled: 'PAL.EVENT.006',
@@ -370,7 +370,7 @@ export class PalisadeIdentitySDK {
                     break;
                 }
 
-                case eventCodes.txApproved: {
+                case eventCodes.transactionApproved: {
 
                     // Tentative error surfacing
                     // TODO: Review whether these fields can actually be undefined
@@ -378,17 +378,17 @@ export class PalisadeIdentitySDK {
                         console.error(`Tx details are not correctly defined`);
                     }
 
-                    this.emit('tx-approved', {
+                    this.emit('transaction-approved', {
                         encodedTx: eventObj.data.encodedTransaction,
                         signature: eventObj.data.signature,
-                        txId: eventObj.data.transactionId
+                        transactionId: eventObj.data.transactionId
                     });
 
                     break;
                 }
 
-                case eventCodes.txRejected: {
-                    this.emit('tx-rejected');
+                case eventCodes.transactionRejected: {
+                    this.emit('transaction-rejected');
                 }
             }
         },

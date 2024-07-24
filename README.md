@@ -21,8 +21,8 @@ Welcome to the **Palisade Identity JavaScript SDK** repository. This SDK enables
 - [Events](#events)
   - [connected](#connected)
   - [disconnected](#disconnected)
-  - [tx-approved](#txApproved)
-  - [tx-rejected](#txRejected)
+  - [transaction-approved](#transactionApproved)
+  - [transaction-rejected](#transactionRejected)
 - [Contact](#contact)
 
 ## Introduction
@@ -95,12 +95,12 @@ palisade.on("connected", () => {});
 palisade.on("disconnected", () => {});
 
 // User approves a transaction
-palisade.on("tx-approved", (data) => {
-  console.log(data.signature, data.id, data.encodedTx);
+palisade.on("transaction-approved", (data) => {
+  console.log(data.signature, data.id, data.encodedTransaction);
 });
 
-// User has disconnected their Palisade wallet
-palisade.on("tx-approved", () => {});
+// User rejects a transaction
+palisade.on("transaction-rejected", () => {});
 ```
 
 # Methods
@@ -197,9 +197,9 @@ palisade.on("disconnected", () => {
 });
 ```
 
-<a id="txApproved"></a>
+<a id="transactionApproved"></a>
 
-### Event: `tx-approved`
+### Event: `transaction-approved`
 
 This event is triggered when a user approves a transaction. It provides detailed information about the approved transaction including the signature, transaction ID, and the encoded transaction data.
 
@@ -209,32 +209,32 @@ The event handler receives a `data` object with the following properties:
 
 - **signature**: `string` - The cryptographic signature of the transaction.
 - **id**: `string` - The unique identifier of the transaction.
-- **encodedTx**: `string` - The encoded representation of the transaction.
+- **encodedTransaction**: `string` - The encoded representation of the transaction.
 
 #### Example
 
-To handle the `tx-approved` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
+To handle the `transaction-approved` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
 
 ```javascript
-palisade.on("tx-approved", (data) => {
+palisade.on("transaction-approved", (data) => {
   console.log("Transaction Signature:", data.signature);
   console.log("Transaction ID:", data.id);
-  console.log("Encoded Transaction:", data.encodedTx);
+  console.log("Encoded Transaction:", data.encodedTransaction);
 });
 ```
 
-<a id="txRejected"></a>
+<a id="transactionRejected"></a>
 
-### Event: `tx-rejected`
+### Event: `transaction-rejected`
 
 This event is triggered when a user rejects a transaction. It does not provide any additional data, as it simply indicates the rejection action.
 
 #### Usage
 
-To handle the `tx-rejected` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
+To handle the `transaction-rejected` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
 
 ```javascript
-palisade.on("tx-rejected", () => {
+palisade.on("transaction-rejected", () => {
   console.log("Transaction was rejected by the user.");
 });
 ```
