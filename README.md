@@ -16,13 +16,13 @@ Welcome to the **Palisade Identity JavaScript SDK** repository. This SDK enables
 - [Quick Start](#quick-start)
 - [Usage](#usage)
 - [Methods](#methods)
-  - [signTransaction](#signTransaction)
-  - [submitTransaction](#submitTransaction)
+  - [signTransaction](#sign-transaction)
+  - [submitTransaction](#submit-transaction)
 - [Events](#events)
   - [connected](#connected)
   - [disconnected](#disconnected)
-  - [transaction-approved](#transactionApproved)
-  - [transaction-rejected](#transactionRejected)
+  - [transaction-approved](#transaction-approved)
+  - [transaction-rejected](#transaction-rejected)
 - [Contact](#contact)
 
 ## Introduction
@@ -105,7 +105,7 @@ palisade.on("transaction-rejected", () => {});
 
 # Methods
 
-<a id="signTransaction"></a>
+<a id="sign-transaction"></a>
 
 ### Method: `palisade.signTransaction(encodedTransaction)`
 
@@ -131,7 +131,7 @@ palisade.signTransaction(encodedTransaction);
 
 In this example, an encoded transaction is passed to the `signTransaction` method. The user is then prompted to use their passkey to approve the transaction, completing the signing process.
 
-<a id="submitTransaction"></a>
+<a id="submit-transaction"></a>
 
 ### Method: `palisade.submitTransaction(encodedTransaction)`
 
@@ -197,7 +197,7 @@ palisade.on("disconnected", () => {
 });
 ```
 
-<a id="transactionApproved"></a>
+<a id="transaction-approved"></a>
 
 ### Event: `transaction-approved`
 
@@ -223,7 +223,7 @@ palisade.on("transaction-approved", (data) => {
 });
 ```
 
-<a id="transactionRejected"></a>
+<a id="transaction-rejected"></a>
 
 ### Event: `transaction-rejected`
 
