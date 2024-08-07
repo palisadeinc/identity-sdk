@@ -20,3 +20,15 @@ Implements the full end to end flow where you can create or login with a new sec
 ### Changed
 
 ### Fixed
+
+## [1.0.0-alpha.14] - 2024-08-07
+
+Extend the `transaction-approved` event response with `canonicalSignature` and `signedtransaction`.
+
+### Added
+
+- `canonicalSignature` and `signedtransaction` are now available on the `transaction-approved` event data response object
+
+### Changed
+
+### Fixed

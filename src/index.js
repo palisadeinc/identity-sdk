@@ -379,8 +379,10 @@ export class PalisadeIdentitySDK {
                     }
 
                     this.emit('transaction-approved', {
+                        canonicalSignature: eventObj.data.canonicalSignature,
                         encodedTransaction: eventObj.data.encodedTransaction,
                         signature: eventObj.data.signature,
+                        signedTransaction: eventObj.data.signedTransaction,
                         transactionId: eventObj.data.transactionId
                     });
 
