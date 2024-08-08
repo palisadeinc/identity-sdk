@@ -211,12 +211,6 @@ export class PalisadeIdentitySDK {
 
     #api = {
         signTransaction: async (rawTransactionHash) => {
-            const authToken = this.#getAuthCookie();
-
-            if (!authToken) {
-                this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
-                return;
-            }
             const url = `${this.sdkConfig.apiUri}/v1/connection/transaction/raw`;
 
             return fetch(url, this.#utils.withAuthToken({
@@ -225,12 +219,6 @@ export class PalisadeIdentitySDK {
             }));
         },
         submitTransaction: async (rawTransactionHash) => {
-            const authToken = this.#getAuthCookie();
-
-            if (!authToken) {
-                this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
-                return;
-            }
             const url = `${this.sdkConfig.apiUri}/v1/connection/transaction/raw`;
 
             return fetch(url, this.#utils.withAuthToken({
