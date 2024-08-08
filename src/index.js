@@ -211,30 +211,30 @@ export class PalisadeIdentitySDK {
 
     #api = {
         signTransaction: async (rawTransactionHash) => {
-            const url = `${this.sdkConfig.apiUri}/v1/connection/signatures`;
             const authToken = this.#getAuthCookie();
 
             if (!authToken) {
                 this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
                 return;
             }
+            const url = `${this.sdkConfig.apiUri}/v1/connection/transaction/raw`;
 
             return fetch(url, this.#utils.withAuthToken({
-                body: JSON.stringify({ data: rawTransactionHash }),
+                body: JSON.stringify({ data: rawTransactionHash, signOnly: true }),
                 method: 'POST'
             }));
         },
         submitTransaction: async (rawTransactionHash) => {
-            const url = `${this.sdkConfig.apiUri}/v1/connection/transactions`;
             const authToken = this.#getAuthCookie();
 
             if (!authToken) {
                 this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
                 return;
             }
+            const url = `${this.sdkConfig.apiUri}/v1/connection/transaction/raw`;
 
             return fetch(url, this.#utils.withAuthToken({
-                body: JSON.stringify({ data: rawTransactionHash }),
+                body: JSON.stringify({ data: rawTransactionHash, signOnly: false }),
                 method: 'POST'
             }));
         }
