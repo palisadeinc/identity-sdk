@@ -171,25 +171,8 @@ export class PalisadeIdentitySDK {
     }
 
     // Private methods
-    async #getWallet() {
-        const url = `${this.sdkConfig.apiUri}/v1/connection/wallets`;
-        const authToken = this.#getAuthCookie();
-
-        if (!authToken) {
-            this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
-            return;
-        }
-
-        return fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            },
-            method: 'GET'
-        });
-    }
-
     async #loadWallet() {
-        const response = await this.#getWallet();
+        const response = await this.#api.getWallet();
 
         if (!response.ok) {
             if (response.status === 401) {
@@ -210,6 +193,13 @@ export class PalisadeIdentitySDK {
     }
 
     #api = {
+        getWallet: async () => {
+            const url = `${this.sdkConfig.apiUri}/v1/connection/wallets`;
+    
+            return fetch(url, this.#utils.withAuthToken({
+                method: 'GET'
+            }));
+        },
         signTransaction: async (rawTransactionHash) => {
             const url = `${this.sdkConfig.apiUri}/v1/connection/transaction/raw`;
 
@@ -342,7 +332,7 @@ export class PalisadeIdentitySDK {
 
                     this.#utils.setCookie(this.sdkConfig.authCookieName, eventObj.data.token, this.sdkConfig.cookieExpiryDays);
 
-                    this.#getWallet()
+                    this.#api.getWallet()
                         .then(async (response) => {
                             const walletObj = await response.json();
                             this.emit('connected', walletObj);
