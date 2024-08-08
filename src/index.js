@@ -201,7 +201,7 @@ export class PalisadeIdentitySDK {
             }));
         },
         signTransaction: async (rawTransactionHash) => {
-            const url = `${this.sdkConfig.apiUri}/v1/connection/transaction/raw`;
+            const url = `${this.sdkConfig.apiUri}/v1/connection/transactions/raw`;
 
             return fetch(url, this.#utils.withAuthToken({
                 body: JSON.stringify({ data: rawTransactionHash, signOnly: true }),
@@ -209,7 +209,7 @@ export class PalisadeIdentitySDK {
             }));
         },
         submitTransaction: async (rawTransactionHash) => {
-            const url = `${this.sdkConfig.apiUri}/v1/connection/transaction/raw`;
+            const url = `${this.sdkConfig.apiUri}/v1/connection/transactions/raw`;
 
             return fetch(url, this.#utils.withAuthToken({
                 body: JSON.stringify({ data: rawTransactionHash, signOnly: false }),
