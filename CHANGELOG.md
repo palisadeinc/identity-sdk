@@ -32,3 +32,16 @@ Extend the `transaction-approved` event response with `canonicalSignature` and `
 ### Changed
 
 ### Fixed
+
+## [1.0.0-alpha.15] - 2024-08-08
+
+### Added
+
+- Always include `X-Cient-ID` and `X-Origin` headers within authorized requests
+
+### Changed
+
+- Consolidate `/transactions` and `/signatures` endpoints into a single `/transactions/raw` endpoint with a `signOnly` flag to align with the core API
+- Clean up unnecessary duplicated authToken check
+
+### Fixed
