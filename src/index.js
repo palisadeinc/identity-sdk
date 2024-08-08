@@ -453,7 +453,9 @@ export class PalisadeIdentitySDK {
                 ...requestConfig,
                 headers: {
                     ...requestConfig.headers,
-                    'Authorization': `Bearer ${authToken}`
+                    'Authorization': `Bearer ${authToken}`,
+                    'X-Client-ID': this.clientConfig.clientId,
+                    'X-Origin': window.location.origin
                 },
 
             }
