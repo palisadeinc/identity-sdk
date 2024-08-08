@@ -35,6 +35,8 @@ Extend the `transaction-approved` event response with `canonicalSignature` and `
 
 ## [1.0.0-alpha.15] - 2024-08-08
 
+Updates to enhance authorization mechanism
+
 ### Added
 
 - Always include `X-Cient-ID` and `X-Origin` headers within authorized requests
@@ -43,5 +45,17 @@ Extend the `transaction-approved` event response with `canonicalSignature` and `
 
 - Consolidate `/transactions` and `/signatures` endpoints into a single `/transactions/raw` endpoint with a `signOnly` flag to align with the core API
 - Clean up unnecessary duplicated authToken check
+
+### Fixed
+
+## [1.0.0-alpha.16] - 2024-08-08
+
+Further updates to enhance authorization
+
+### Added
+
+### Changed
+
+- Move getWallet into #api and update to use the same Auth mechanism as the other api calls
 
 ### Fixed
