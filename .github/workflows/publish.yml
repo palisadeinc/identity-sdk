@@ -3,8 +3,8 @@ name: Publish npm package
 on:
   push:
     tags:
-      - "v*.*.*-alpha.*" # Triggers the workflow on alpha version tags
-      - "v*.*.*" # Triggers the workflow on version tags
+      - "v*.*.*-alpha.*"
+      - "v*.*.*"
 
 jobs:
   publish:
@@ -25,10 +25,17 @@ jobs:
       - name: Build package
         run: npm run build
 
-      - name: Add user to npm
-        run: npm adduser
+      - name: Set up .npmrc
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm
-        run: npm publish
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v*-alpha.* ]]; then
+            npm publish --tag alpha
+          else
+            npm publish
+          fi
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
