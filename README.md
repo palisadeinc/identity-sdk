@@ -103,6 +103,32 @@ palisade.on("transaction-approved", (data) => {
 palisade.on("transaction-rejected", () => {});
 ```
 
+## Client Configuration Options
+
+| Field              | Type    | Required | Default                    | Description                                                   |
+| ------------------ | ------- | -------- | -------------------------- | ------------------------------------------------------------- |
+| clientId           | string  | ✅       | –                          | Your Palisade Client ID                                       |
+| iconUrl            | string  | ❌       | https://placehold.co/40x40 | Optional URL to your brand icon shown in the UI (40px x 40px) |
+| options            | object  | ❌       | –                          | Optional configuration for enabling/disabling UI flows        |
+| └ isConnectEnabled | boolean | ❌       | true                       | Enables the “Connect” flow for returning users                |
+| └ isCreateEnabled  | boolean | ❌       | true                       | Enables the “Create” flow for new user registration           |
+
+- If both `isConnectEnabled` and `isCreateEnabled` are set to `false`, an error will be thrown.
+- If omitted, both options default to `true`.
+
+**Example:**
+
+```javascript
+const palisade = new PalisadeIdentitySDK({
+  clientId: "YOUR_CLIENT_ID",
+  iconUrl: "https://placehold.co/40x40",
+  options: {
+    isConnectEnabled: false,
+    isCreateEnabled: true,
+  },
+});
+```
+
 # Methods
 
 <a id="sign-transaction"></a>
@@ -237,33 +263,6 @@ To handle the `transaction-rejected` event, you need to subscribe to it using th
 palisade.on("transaction-rejected", () => {
   console.log("Transaction was rejected by the user.");
 });
-```
-
-## Client Configuration Options
-
-| Field               | Type    | Required | Default | Description                                      |
-|---------------------|---------|----------|---------|--------------------------------------------------|
-| clientId            | string  | ✅       | –       | Your Palisade Client ID                          |
-| iconUrl             | string  | ✅       | –       | URL to your brand icon shown in the UI           |
-| options             | object  | ❌       | –       | Optional configuration for enabling/disabling UI flows |
-| └ isConnectEnabled  | boolean | ❌       | true    | Enables the “Connect” flow for returning users   |
-| └ isCreateEnabled   | boolean | ❌       | true    | Enables the “Create” flow for new user registration |
-
-- If both `isConnectEnabled` and `isCreateEnabled` are set to `false`, an error will be thrown.
-- If omitted, both options default to `true`.
-
-**Example:**
-
-```javascript
-const palisade = new PalisadeIdentitySDK({
-  clientId: "YOUR_CLIENT_ID",
-  iconUrl: "https://placehold.co/40x40",
-  options: {
-    isConnectEnabled: false,
-    isCreateEnabled: true
-  }
-});
-```
 
 ## Contact
 
