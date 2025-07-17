@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - README now documents the `options` configuration, usage examples, and defaults.
 - CHANGELOG is now listed in DESC order
+- Bump esbuild from 0.23.0 to 0.25.0
 
 ## [1.0.0-alpha.18] - 2024-08-08
 
