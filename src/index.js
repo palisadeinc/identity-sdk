@@ -93,7 +93,7 @@ export class PalisadeIdentitySDK {
                     return environmentDomains.production;
                 }
                 default: {
-                    return environmentDomains.development;
+                    return environmentDomains.sandbox;
                 }
             }
         }

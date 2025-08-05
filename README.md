@@ -112,6 +112,7 @@ palisade.on("transaction-rejected", () => {});
 | options            | object  | ❌       | –                          | Optional configuration for enabling/disabling UI flows        |
 | └ isConnectEnabled | boolean | ❌       | true                       | Enables the “Connect” flow for returning users                |
 | └ isCreateEnabled  | boolean | ❌       | true                       | Enables the “Create” flow for new user registration           |
+| passkeyName        | string  | ❌       | –                          | Optional pre-defined passkey name in account creation         |
 
 - If both `isConnectEnabled` and `isCreateEnabled` are set to `false`, an error will be thrown.
 - If omitted, both options default to `true`.
@@ -267,3 +268,4 @@ palisade.on("transaction-rejected", () => {
 ## Contact
 
 If you have any questions, issues, or feedback, please open an issue on this repository or contact us at support@palisade.co
+```
