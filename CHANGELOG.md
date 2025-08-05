@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.0-alpha.20] - 2025-08-05
+
+### Added
+
+- New optional `passkeyName` property to `PalisadeIdentitySDK` config to allow pre-defining the passkey name
+
+### Updated
+
+- Default environment updated to Sandbox from Development
+- Github action now publishes to npm on version tag push
+
 ## [1.0.0-alpha.19] - 2025-07-17
 
 ### Added
