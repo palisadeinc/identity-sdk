@@ -127,6 +127,7 @@ const palisade = new PalisadeIdentitySDK({
     isConnectEnabled: false,
     isCreateEnabled: true,
   },
+  passkeyName: "YOUR_APP_NAME",
 });
 ```
 
