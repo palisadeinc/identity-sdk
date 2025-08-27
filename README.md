@@ -105,14 +105,16 @@ palisade.on("transaction-rejected", () => {});
 
 ## Client Configuration Options
 
-| Field              | Type    | Required | Default                    | Description                                                   |
-| ------------------ | ------- | -------- | -------------------------- | ------------------------------------------------------------- |
-| clientId           | string  | ✅       | –                          | Your Palisade Client ID                                       |
-| iconUrl            | string  | ❌       | https://placehold.co/40x40 | Optional URL to your brand icon shown in the UI (40px x 40px) |
-| options            | object  | ❌       | –                          | Optional configuration for enabling/disabling UI flows        |
-| └ isConnectEnabled | boolean | ❌       | true                       | Enables the “Connect” flow for returning users                |
-| └ isCreateEnabled  | boolean | ❌       | true                       | Enables the “Create” flow for new user registration           |
-| passkeyName        | string  | ❌       | –                          | Optional pre-defined passkey name in account creation         |
+| Field              | Type    | Required | Default                    | Description                                                           |
+| ------------------ | ------- | -------- | -------------------------- | --------------------------------------------------------------------- |
+| clientId           | string  | ✅       | –                          | Your Palisade Client ID                                               |
+| iconUrl            | string  | ❌       | https://placehold.co/40x40 | Optional URL to your brand icon shown in the UI (40px x 40px)         |
+| logoUrl            | string  | ❌       | -                          | Optional Logo URL to replace the Logo in the UI (400px x 50px limit)  |
+| logoAlt            | string  | ❌       | -                          | Optional Logo Alt text. Should be supplied if the logoUrl is supplied |
+| options            | object  | ❌       | –                          | Optional configuration for enabling/disabling UI flows                |
+| └ isConnectEnabled | boolean | ❌       | true                       | Enables the “Connect” flow for returning users                        |
+| └ isCreateEnabled  | boolean | ❌       | true                       | Enables the “Create” flow for new user registration                   |
+| passkeyName        | string  | ❌       | –                          | Optional pre-defined passkey name in account creation                 |
 
 - If both `isConnectEnabled` and `isCreateEnabled` are set to `false`, an error will be thrown.
 - If omitted, both options default to `true`.
@@ -123,6 +125,8 @@ palisade.on("transaction-rejected", () => {});
 const palisade = new PalisadeIdentitySDK({
   clientId: "YOUR_CLIENT_ID",
   iconUrl: "https://placehold.co/40x40",
+  logoAlt: "Example Logo",
+  logoUrl: "https://placehold.co/400x40",
   options: {
     isConnectEnabled: false,
     isCreateEnabled: true,
