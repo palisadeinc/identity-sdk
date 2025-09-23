@@ -254,6 +254,7 @@ export class PalisadeIdentitySDK {
         closeModal: () => {
             if (!!PalisadeIdentitySDK.openedWindow) {
                 PalisadeIdentitySDK.openedWindow.close();
+                PalisadeIdentitySDK.openedWindow = null;
             }
         },
 
@@ -386,10 +387,29 @@ export class PalisadeIdentitySDK {
         openModal: (configEncoded) => {
             const halfOfModalWidth = parseInt(this.sdkConfig.modal.width) / 2;
             const left = ((screen.width / 2) - halfOfModalWidth);
+            const url = `${this.sdkConfig.domain}?config=${configEncoded}`;
+
+            if (!!PalisadeIdentitySDK.openedWindow && !PalisadeIdentitySDK.openedWindow.closed) {
+                PalisadeIdentitySDK.openedWindow.location = url;
+                PalisadeIdentitySDK.openedWindow.focus();
+                return;
+            }
 
             PalisadeIdentitySDK.openedWindow = window.open(
                 `${this.sdkConfig.domain}?config=${configEncoded}`,
                 this.sdkConfig.modal.title,
+                `left=${left},top=${this.sdkConfig.modal.positionTop},width=${this.sdkConfig.modal.width},height=${this.sdkConfig.modal.height}`
+            );
+        },
+
+        // To prevent popup blockers, we open a blank modal first, then set the URL post api call
+        openModalPlaceholder: () => {
+            const halfOfModalWidth = parseInt(this.sdkConfig.modal.width) / 2;
+            const left = ((screen.width / 2) - halfOfModalWidth);
+
+            PalisadeIdentitySDK.openedWindow = window.open(
+                'about:blank',
+                '_blank',
                 `left=${left},top=${this.sdkConfig.modal.positionTop},width=${this.sdkConfig.modal.width},height=${this.sdkConfig.modal.height}`
             );
         },
@@ -516,10 +536,13 @@ export class PalisadeIdentitySDK {
             return;
         }
 
+        this.#utils.openModalPlaceholder();
+
         const response = await this.#api.signTransaction(rawTransactionHash);
 
         if (!response.ok) {
             this.#utils.onError(this.sdkConfig.errorCodes.unableToSignTransaction);
+            this.#utils.closeModal();
             return;
         }
 
@@ -549,10 +572,13 @@ export class PalisadeIdentitySDK {
             return;
         }
 
+        this.#utils.openModalPlaceholder();
+
         const response = await this.#api.submitTransaction(rawTransactionHash);
 
         if (!response.ok) {
             this.#utils.onError(this.sdkConfig.errorCodes.unableToSubmitTransaction);
+            this.#utils.closeModal();
             return;
         }
 
