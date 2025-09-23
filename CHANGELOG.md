@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.1] - 2025-09-23
+
+### Updated
+
+- `openWindow` mechanism updated for sign/submit transaction methods to prevent popup blocking by making sure the window is pre-opened immediately on user interaction
+
 ## [1.0.0-alpha.21] - 2025-08-27
 
 ### Added
