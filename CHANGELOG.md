@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.2] - 2025-10-06
+
+### Added
+
+- `transaction-failed` event for failed transactions, including `transactionId`, `reasons` (array) and `transactionStatus`
+
 ## [1.0.1] - 2025-09-23
 
 ### Updated
