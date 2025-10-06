@@ -27,7 +27,7 @@ class EventEmitter {
         if (!this.eventListeners[eventName]) {
             this.eventListeners[eventName] = [];
         }
-        
+
         this.eventListeners[eventName].push(callback);
     }
 
@@ -36,10 +36,10 @@ class EventEmitter {
         if (!this.#isValidEvent(eventName)) {
             throw new Error(`Invalid event name: ${eventName}`);
         }
-        
+
         if (!this.eventListeners[eventName]) return;
 
-        delete(this.eventListeners[eventName]);
+        delete (this.eventListeners[eventName]);
     }
 
     // Emit an event
@@ -75,7 +75,7 @@ export class PalisadeIdentitySDK {
             production: "https://identity.palisade.co"
         };
 
-        function getDomainForEnvironment (clientConfig, urlParam) {
+        function getDomainForEnvironment(clientConfig, urlParam) {
 
             if (!!urlParam) {
                 return urlParam;
@@ -137,20 +137,23 @@ export class PalisadeIdentitySDK {
             }
         };
 
-        this.clientConfig = {...clientConfig, ...{
-            domain: window.location.origin,
-            environment: !!clientConfig.environment ? clientConfig.environment : 'DEV'
-        }};
+        this.clientConfig = {
+            ...clientConfig, ...{
+                domain: window.location.origin,
+                environment: !!clientConfig.environment ? clientConfig.environment : 'DEV'
+            }
+        };
 
         this.isConnected = this.#getIsConnected();
         this.wallet = null;
-		this.transactionId = null;
+        this.transactionId = null;
 
         const publicEventNames = [
             'connected',
             'disconnected',
             'transaction-approved',
             'transaction-rejected',
+            'transaction-failed'
         ];
 
         this.publicEvents = new EventEmitter(publicEventNames);
@@ -195,7 +198,7 @@ export class PalisadeIdentitySDK {
     #api = {
         getWallet: async () => {
             const url = `${this.sdkConfig.apiUri}/v1/connection/wallets`;
-    
+
             return fetch(url, this.#utils.withAuthToken({
                 method: 'GET'
             }));
@@ -227,7 +230,7 @@ export class PalisadeIdentitySDK {
     }
 
     #initialiseMessageEventListener() {
-        
+
         window.addEventListener('message', (event) => {
             if (event.origin !== this.sdkConfig.domain) {
                 return;
@@ -320,7 +323,8 @@ export class PalisadeIdentitySDK {
                 loggedIn: 'PAL.EVENT.004',
                 registered: 'PAL.EVENT.005',
                 passkeyLoginCancelled: 'PAL.EVENT.006',
-                passkeyRegistrationCancelled: 'PAL.EVENT.007'
+                passkeyRegistrationCancelled: 'PAL.EVENT.007',
+                transactionFailed: 'PAL.EVENT.008'
             };
 
             switch (eventObj.data.code) {
@@ -370,6 +374,15 @@ export class PalisadeIdentitySDK {
 
                 case eventCodes.transactionRejected: {
                     this.emit('transaction-rejected');
+                }
+
+                case eventCodes.transactionFailed: {
+
+                    this.emit('transaction-failed', {
+                        transactionId: eventObj.data.transactionId,
+                        transactionStatus: eventObj.data.transactionStatus,
+                        reasons: eventObj.data.reasons
+                    });
                 }
             }
         },
@@ -441,7 +454,7 @@ export class PalisadeIdentitySDK {
         withAuthToken: (requestConfig) => {
 
             const authToken = this.#getAuthCookie();
-     
+
             if (!authToken) {
                 this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
                 return;
@@ -547,8 +560,8 @@ export class PalisadeIdentitySDK {
         }
 
         const data = await response.json();
-		
-		this.transactionId = data.ID;
+
+        this.transactionId = data.ID;
 
         const clientConfig = {
             ...this.clientConfig,
@@ -584,7 +597,7 @@ export class PalisadeIdentitySDK {
 
         const data = await response.json();
 
-		this.transactionId = data.ID;
+        this.transactionId = data.ID;
 
         const clientConfig = {
             ...this.clientConfig,

@@ -23,6 +23,7 @@ Welcome to the **Palisade Identity JavaScript SDK** repository. This SDK enables
   - [disconnected](#disconnected)
   - [transaction-approved](#transaction-approved)
   - [transaction-rejected](#transaction-rejected)
+  - [transaction-failed](#transaction-failed)
 - [Contact](#contact)
 
 ## Introduction
@@ -101,6 +102,14 @@ palisade.on("transaction-approved", (data) => {
 
 // User rejects a transaction
 palisade.on("transaction-rejected", () => {});
+
+// Transaction fails due to technical issues
+palisade.on("transaction-failed", (data) => {
+  console.log(
+    `Transaction failed: ${data.transactionId}, Status: ${data.transactionStatus}`
+  );
+  console.log(`Reasons: ${data.reasons.join(", ")}`);
+});
 ```
 
 ## Client Configuration Options
@@ -269,8 +278,35 @@ To handle the `transaction-rejected` event, you need to subscribe to it using th
 palisade.on("transaction-rejected", () => {
   console.log("Transaction was rejected by the user.");
 });
+```
+
+<a id="transaction-failed"></a>
+
+### Event: `transaction-failed`
+
+This event is triggered when a transaction fails. It provides detailed error information to help developers diagnose and handle the failure appropriately.
+
+#### Event Data Structure
+
+The event handler receives a data object with the following properties:
+
+- **reasons**: `array` - An array of failure reasons or error messages explaining what went wrong.
+- **transactionId**: `string` - The unique identifier of the transaction that failed.
+- **transactionStatus**: `string` - The status of the transaction at the time of failure.
+
+#### Example
+
+To handle the `transaction-failed` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
+
+```javascript
+palisade.on("transaction-failed", (data) => {
+  console.log("Transaction ID:", data.transactionId);
+  console.log("Failure Reasons:", data.reasons);
+});
+```
+
+## Client Configuration Options
 
 ## Contact
 
 If you have any questions, issues, or feedback, please open an issue on this repository or contact us at support@palisade.co
-```
