@@ -151,6 +151,7 @@ export class PalisadeIdentitySDK {
             'disconnected',
             'transaction-approved',
             'transaction-rejected',
+            'transaction-failed'
         ];
 
         this.publicEvents = new EventEmitter(publicEventNames);
@@ -320,7 +321,8 @@ export class PalisadeIdentitySDK {
                 loggedIn: 'PAL.EVENT.004',
                 registered: 'PAL.EVENT.005',
                 passkeyLoginCancelled: 'PAL.EVENT.006',
-                passkeyRegistrationCancelled: 'PAL.EVENT.007'
+                passkeyRegistrationCancelled: 'PAL.EVENT.007',
+                transactionFailed: 'PAL.EVENT.008'
             };
 
             switch (eventObj.data.code) {
@@ -370,6 +372,15 @@ export class PalisadeIdentitySDK {
 
                 case eventCodes.transactionRejected: {
                     this.emit('transaction-rejected');
+                }
+
+                case eventCodes.transactionFailed: {
+
+                    this.emit('transaction-failed', {
+                        transactionId: eventObj.data.transactionId,
+                        transactionStatus: eventObj.data.transactionStatus,
+                        reasons: eventObj.data.reasons
+                    });
                 }
             }
         },
