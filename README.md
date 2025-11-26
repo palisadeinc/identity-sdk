@@ -63,12 +63,12 @@ yarn add @palisadeinc/identity-sdk
 Here's a simple example to get you started with the Palisade Identity SDK:
 
 ```javascript
-import { PalisadeIdentitySDK } from "@palisadeinc/identity-sdk";
+import { PalisadeIdentitySDK } from '@palisadeinc/identity-sdk';
 
 // Initialize the SDK
 const palisade = new PalisadeIdentitySDK({
-  clientId: "YOUR_CLIENT_ID",
-  iconUrl: "https://placehold.co/40x40",
+  clientId: 'YOUR_CLIENT_ID',
+  iconUrl: 'https://placehold.co/40x40'
 });
 
 // Call the connect method to initiate the create wallet / login flow
@@ -82,33 +82,33 @@ palisade.connect();
 Before using any SDK functions, you must initialize it with your configuration:
 
 ```javascript
-import { PalisadeIdentitySDK } from "@palisadeinc/identity-sdk";
+import { PalisadeIdentitySDK } from '@palisadeinc/identity-sdk';
 
 const palisade = new PalisadeIdentitySDK({
-  clientId: "YOUR_CLIENT_ID",
-  iconUrl: "https://placehold.co/40x40",
+  clientId: 'YOUR_CLIENT_ID',
+  iconUrl: 'https://placehold.co/40x40'
 });
 
 // User creates or connects their Palisade wallet
-palisade.on("connected", () => {});
+palisade.on('connected', () => {});
 
 // User disconnects their Palisade wallet
-palisade.on("disconnected", () => {});
+palisade.on('disconnected', () => {});
 
 // User approves a transaction
-palisade.on("transaction-approved", (data) => {
+palisade.on('transaction-approved', (data) => {
   console.log(data.signature, data.id, data.encodedTransaction);
 });
 
 // User rejects a transaction
-palisade.on("transaction-rejected", () => {});
+palisade.on('transaction-rejected', () => {});
 
 // Transaction fails due to technical issues
-palisade.on("transaction-failed", (data) => {
+palisade.on('transaction-failed', (data) => {
   console.log(
     `Transaction failed: ${data.transactionId}, Status: ${data.transactionStatus}`
   );
-  console.log(`Reasons: ${data.reasons.join(", ")}`);
+  console.log(`Reasons: ${data.reasons.join(', ')}`);
 });
 ```
 
@@ -117,7 +117,7 @@ palisade.on("transaction-failed", (data) => {
 | Field              | Type    | Required | Default                    | Description                                                           |
 | ------------------ | ------- | -------- | -------------------------- | --------------------------------------------------------------------- |
 | clientId           | string  | ✅       | –                          | Your Palisade Client ID                                               |
-| environment        | string  | ❌       | STAGING                    | Environment to use: STAGING or PRODUCTION                             |
+| environment        | string  | ❌       | SANDBOX                    | Environment to use: SANDBOX or PRODUCTION                             |
 | iconUrl            | string  | ❌       | https://placehold.co/40x40 | Optional URL to your brand icon shown in the UI (40px x 40px)         |
 | logoUrl            | string  | ❌       | -                          | Optional Logo URL to replace the Logo in the UI (400px x 50px limit)  |
 | logoAlt            | string  | ❌       | -                          | Optional Logo Alt text. Should be supplied if the logoUrl is supplied |
@@ -134,15 +134,15 @@ palisade.on("transaction-failed", (data) => {
 
 ```javascript
 const palisade = new PalisadeIdentitySDK({
-  clientId: "YOUR_CLIENT_ID",
-  iconUrl: "https://placehold.co/40x40",
-  logoAlt: "Example Logo",
-  logoUrl: "https://placehold.co/400x40",
+  clientId: 'YOUR_CLIENT_ID',
+  iconUrl: 'https://placehold.co/40x40',
+  logoAlt: 'Example Logo',
+  logoUrl: 'https://placehold.co/400x40',
   options: {
     isConnectEnabled: false,
-    isCreateEnabled: true,
+    isCreateEnabled: true
   },
-  passkeyName: "YOUR_APP_NAME",
+  passkeyName: 'YOUR_APP_NAME'
 });
 ```
 
@@ -167,7 +167,7 @@ When `palisade.signTransaction(encodedTransaction)` is called, a window is opene
 To sign a transaction, call the `palisade.signTransaction` method with the encoded transaction data as the parameter. Here's an example of how to do it:
 
 ```javascript
-const encodedTransaction = "base64encodedtransactiondata";
+const encodedTransaction = 'base64encodedtransactiondata';
 
 palisade.signTransaction(encodedTransaction);
 ```
@@ -201,7 +201,7 @@ When `palisade.submitTransaction(encodedTransaction)` is called, the provided en
 To submit a transaction, call the `palisade.submitTransaction` method with the encoded transaction data as the parameter. Here's an example of how to do it:
 
 ```javascript
-const encodedTransaction = "base64encodedtransactiondata";
+const encodedTransaction = 'base64encodedtransactiondata';
 
 palisade.submitTransaction(encodedTransaction);
 ```
@@ -219,8 +219,8 @@ This event is triggered when the connection to the Palisade service is successfu
 To handle the `connected` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
 
 ```javascript
-palisade.on("connected", () => {
-  console.log("Successfully connected to Palisade service.");
+palisade.on('connected', () => {
+  console.log('Successfully connected to Palisade service.');
 });
 ```
 
@@ -235,8 +235,8 @@ This event is triggered when the connection to the Palisade service is lost. It 
 To handle the `disconnected` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
 
 ```javascript
-palisade.on("disconnected", () => {
-  console.log("Disconnected from Palisade service.");
+palisade.on('disconnected', () => {
+  console.log('Disconnected from Palisade service.');
 });
 ```
 
@@ -259,10 +259,10 @@ The event handler receives a `data` object with the following properties:
 To handle the `transaction-approved` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
 
 ```javascript
-palisade.on("transaction-approved", (data) => {
-  console.log("Transaction Signature:", data.signature);
-  console.log("Transaction ID:", data.id);
-  console.log("Encoded Transaction:", data.encodedTransaction);
+palisade.on('transaction-approved', (data) => {
+  console.log('Transaction Signature:', data.signature);
+  console.log('Transaction ID:', data.id);
+  console.log('Encoded Transaction:', data.encodedTransaction);
 });
 ```
 
@@ -277,8 +277,8 @@ This event is triggered when a user rejects a transaction. It does not provide a
 To handle the `transaction-rejected` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
 
 ```javascript
-palisade.on("transaction-rejected", () => {
-  console.log("Transaction was rejected by the user.");
+palisade.on('transaction-rejected', () => {
+  console.log('Transaction was rejected by the user.');
 });
 ```
 
@@ -301,9 +301,9 @@ The event handler receives a data object with the following properties:
 To handle the `transaction-failed` event, you need to subscribe to it using the `palisade.on` method. Here's an example of how to do it:
 
 ```javascript
-palisade.on("transaction-failed", (data) => {
-  console.log("Transaction ID:", data.transactionId);
-  console.log("Failure Reasons:", data.reasons);
+palisade.on('transaction-failed', (data) => {
+  console.log('Transaction ID:', data.transactionId);
+  console.log('Failure Reasons:', data.reasons);
 });
 ```
 
