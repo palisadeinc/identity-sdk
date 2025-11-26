@@ -1,0 +1,18 @@
+# Build output
+dist/
+build/
+
+# Test coverage
+coverage/
+
+# Dependencies
+node_modules/
+
+# Generated files
+*.generated.*
+*.gen.*
+
+# Other common directories to ignore
+.cache/
+.tmp/
+infrastructure/
