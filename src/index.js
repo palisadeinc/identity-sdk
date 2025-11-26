@@ -48,8 +48,12 @@ class EventEmitter {
             throw new Error(`Invalid event name: ${eventName}`);
         }
 
-        this.eventListeners[eventName].forEach(listener => {
-            listener(data)
+        if (!this.eventListeners[eventName]) {
+            return;
+        }
+
+        this.eventListeners[eventName].forEach((listener) => {
+            listener(data);
         });
     }
 
