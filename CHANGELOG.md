@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.3] - 2025-11-26
+
+### Added
+
+- Ability to `autoconnect`, skipping the connection state in the flow
+
+### Updated
+
+- Bugfix to prevent actioning multiple events on event emitting
+- Update README to include missing `environment` property and `config.autoconnect`
+
 ## [1.0.2] - 2025-10-06
 
 ### Added
