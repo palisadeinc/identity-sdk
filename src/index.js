@@ -378,15 +378,18 @@ export class PalisadeIdentitySDK {
 
                 case eventCodes.transactionRejected: {
                     this.emit('transaction-rejected');
+
+                    break;
                 }
 
                 case eventCodes.transactionFailed: {
-
                     this.emit('transaction-failed', {
                         transactionId: eventObj.data.transactionId,
                         transactionStatus: eventObj.data.transactionStatus,
                         reasons: eventObj.data.reasons
                     });
+
+                    break;
                 }
             }
         },
