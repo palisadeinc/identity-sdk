@@ -49,7 +49,9 @@ class EventEmitter {
     // Emit an event
     emit(eventName, data) {
         if (!this.#isValidEvent(eventName)) {
-            throw new Error(`Invalid event name: ${eventName}`);
+            throw new Error(
+                `Palisade Identity SDK: There is no event named: ${eventName}`
+            );
         }
 
         if (!this.eventListeners[eventName]) {
@@ -135,7 +137,10 @@ export class PalisadeIdentitySDK {
                 unableToGetWallet: 'PAL.ERROR.103',
                 unableToSignTransaction: 'PAL.ERROR.104',
                 unableToSubmitTransaction: 'PAL.ERROR.105',
-                jwtNotAuthenticated: 'PAL.ERROR.106'
+                jwtNotAuthenticated: 'PAL.ERROR.106',
+                invalidTransactionHash: 'PAL.ERROR.107',
+                invalidToken: 'PAL.ERROR.108',
+                invalidTransactionDetails: 'PAL.ERROR.109'
             },
             errorMessages: {
                 'PAL.ERROR.101':
@@ -145,7 +150,11 @@ export class PalisadeIdentitySDK {
                 'PAL.ERROR.104': 'Unable to sign transaction',
                 'PAL.ERROR.105': 'Unable to submit transaction',
                 'PAL.ERROR.106':
-                    'JWT is not authenticated so the app has disconnected'
+                    'JWT is not authenticated so the app has disconnected',
+                'PAL.ERROR.107': 'Invalid transaction hash',
+                'PAL.ERROR.108': 'The token provided on connection is invalid',
+                'PAL.ERROR.109':
+                    'Transaction details are not populated correctly'
             }
         };
 
@@ -166,6 +175,7 @@ export class PalisadeIdentitySDK {
         const publicEventNames = [
             'connected',
             'disconnected',
+            'error',
             'transaction-approved',
             'transaction-rejected',
             'transaction-failed'
@@ -192,6 +202,11 @@ export class PalisadeIdentitySDK {
     async #loadWallet() {
         const response = await this.#api.getWallet();
 
+        if (!response) {
+            this.#utils.onError(this.sdkConfig.errorCodes.unableToGetWallet);
+            return;
+        }
+
         if (!response.ok) {
             if (response.status === 401) {
                 this.#utils.onError(
@@ -215,41 +230,56 @@ export class PalisadeIdentitySDK {
     #api = {
         getWallet: async () => {
             const url = `${this.sdkConfig.apiUri}/v1/connection/wallets`;
+            const requestConfig = this.#utils.withAuthToken({
+                method: 'GET'
+            });
 
-            return fetch(
-                url,
-                this.#utils.withAuthToken({
-                    method: 'GET'
-                })
-            );
+            if (!requestConfig) {
+                this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
+                this.disconnect();
+                this.#utils.closeModal();
+                return;
+            }
+
+            return fetch(url, requestConfig);
         },
         signTransaction: async (rawTransactionHash) => {
             const url = `${this.sdkConfig.apiUri}/v1/connection/transactions/raw`;
+            const requestConfig = this.#utils.withAuthToken({
+                body: JSON.stringify({
+                    data: rawTransactionHash,
+                    signOnly: true
+                }),
+                method: 'POST'
+            });
 
-            return fetch(
-                url,
-                this.#utils.withAuthToken({
-                    body: JSON.stringify({
-                        data: rawTransactionHash,
-                        signOnly: true
-                    }),
-                    method: 'POST'
-                })
-            );
+            if (!requestConfig) {
+                this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
+                this.disconnect();
+                this.#utils.closeModal();
+                return;
+            }
+
+            return fetch(url, requestConfig);
         },
         submitTransaction: async (rawTransactionHash) => {
             const url = `${this.sdkConfig.apiUri}/v1/connection/transactions/raw`;
+            const requestConfig = this.#utils.withAuthToken({
+                body: JSON.stringify({
+                    data: rawTransactionHash,
+                    signOnly: false
+                }),
+                method: 'POST'
+            });
 
-            return fetch(
-                url,
-                this.#utils.withAuthToken({
-                    body: JSON.stringify({
-                        data: rawTransactionHash,
-                        signOnly: false
-                    }),
-                    method: 'POST'
-                })
-            );
+            if (!requestConfig) {
+                this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
+                this.disconnect();
+                this.#utils.closeModal();
+                return;
+            }
+
+            return fetch(url, requestConfig);
         }
     };
 
@@ -271,7 +301,7 @@ export class PalisadeIdentitySDK {
                 case 'ERROR': {
                     this.#utils.onError(
                         event.data.code,
-                        event.data.errorMessages
+                        event.data.messages.error
                     );
                     break;
                 }
@@ -290,8 +320,10 @@ export class PalisadeIdentitySDK {
     #utils = {
         closeModal: () => {
             if (!!PalisadeIdentitySDK.openedWindow) {
-                PalisadeIdentitySDK.openedWindow.close();
-                PalisadeIdentitySDK.openedWindow = null;
+                setTimeout(() => {
+                    PalisadeIdentitySDK.openedWindow.close();
+                    PalisadeIdentitySDK.openedWindow = null;
+                }, 500);
             }
         },
 
@@ -333,25 +365,28 @@ export class PalisadeIdentitySDK {
             return typeof value === 'string';
         },
 
-        // TODO: Move to emit / subscribe model
         onError: (errorCode, errorMessages) => {
-            if (typeof this.clientConfig.onError === 'function') {
-                this.clientConfig.onError(errorCode, {
-                    errorMessages,
-                    ...this.sdkConfig.errorMessages
+            const serviceErrorMessage =
+                !!errorMessages &&
+                errorMessages.find(
+                    (errorMessage) => errorMessage.code === errorCode
+                );
+            if (!!serviceErrorMessage) {
+                this.emit('error', {
+                    level: 'SERVICE',
+                    ...serviceErrorMessage
+                });
+            } else if (!!this.sdkConfig.errorMessages[errorCode]) {
+                this.emit('error', {
+                    level: 'SDK',
+                    code: errorCode,
+                    description: this.sdkConfig.errorMessages[errorCode]
                 });
             } else {
-                if (!!errorMessages && !!errorMessages[errorCode]) {
-                    console.error(
-                        `Palisade Identity UI Error [${errorCode}]: ${errorMessages[errorCode]}`
-                    );
-                } else if (!!this.sdkConfig.errorMessages[errorCode]) {
-                    console.error(
-                        `Palisade SDK Error [${errorCode}]: ${this.sdkConfig.errorMessages[errorCode]}`
-                    );
-                } else {
-                    console.error(`Undefined Error code: [${errorCode}]}`);
-                }
+                this.emit('error', {
+                    level: 'UNKNOWN',
+                    errorCode
+                });
             }
         },
 
@@ -371,8 +406,8 @@ export class PalisadeIdentitySDK {
             switch (eventObj.data.code) {
                 case eventCodes.connected: {
                     if (!eventObj.data || !eventObj.data.token) {
-                        console.error(
-                            `No token defined in ${eventObj.code} response`
+                        this.#utils.onError(
+                            this.sdkConfig.errorCodes.invalidToken
                         );
                         return;
                     }
@@ -396,7 +431,6 @@ export class PalisadeIdentitySDK {
                             this.#utils.onError(
                                 this.sdkConfig.errorCodes.unableToGetWallet
                             );
-                            console.error(error);
                         });
 
                     break;
@@ -411,7 +445,9 @@ export class PalisadeIdentitySDK {
                         !eventObj.data.signature ||
                         !eventObj.data.transactionId
                     ) {
-                        console.error(`Tx details are not correctly defined`);
+                        this.#utils.onError(
+                            this.sdkConfig.errorCodes.invalidTransactionDetails
+                        );
                     }
 
                     this.emit('transaction-approved', {
@@ -513,8 +549,7 @@ export class PalisadeIdentitySDK {
             const authToken = this.#getAuthCookie();
 
             if (!authToken) {
-                this.#utils.onError(this.sdkConfig.errorCodes.noAuthToken);
-                return;
+                return null;
             }
 
             return {
@@ -607,9 +642,21 @@ export class PalisadeIdentitySDK {
             return;
         }
 
+        if (!rawTransactionHash) {
+            this.#utils.onError(
+                this.sdkConfig.errorCodes.invalidTransactionHash
+            );
+            this.disconnect();
+            return;
+        }
+
         this.#utils.openModalPlaceholder();
 
         const response = await this.#api.signTransaction(rawTransactionHash);
+
+        if (!response) {
+            return;
+        }
 
         if (!response.ok) {
             this.#utils.onError(
@@ -646,9 +693,20 @@ export class PalisadeIdentitySDK {
             return;
         }
 
+        if (!rawTransactionHash) {
+            this.#utils.onError(
+                this.sdkConfig.errorCodes.invalidTransactionHash
+            );
+            return;
+        }
+
         this.#utils.openModalPlaceholder();
 
         const response = await this.#api.submitTransaction(rawTransactionHash);
+
+        if (!response) {
+            return;
+        }
 
         if (!response.ok) {
             this.#utils.onError(
