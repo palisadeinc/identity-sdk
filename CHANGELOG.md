@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.0] - 2025-12-11
+
+### Added
+
+- New `error` event emitted with error code and message when an error occurs
+- Typescript definitions for the SDK
+
+### Updated
+
+- `onError` config option has been deprecated. Please use the `error` event instead
+- Improve error handling in SDK when raw transaction fails
+- Trigger `disconnect` if auth cookie is invalidated
+- Point to distributed minified version of the SDK in package.json and filter out source files from npm package
+
 ## [1.1.1] - 2025-11-26
 
 ### Updated
