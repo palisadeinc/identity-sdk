@@ -7,23 +7,17 @@ export declare class PalisadeIdentitySDK {
   signTransaction(rawTransactionHash: string): Promise<void>;
   submitTransaction(rawTransactionHash: string): Promise<void>;
 
-  on(
-    event: 'connected',
-    callback: (wallet: PalisadeIdentitySDK.Wallet) => void
-  ): void;
+  on(event: 'connected', callback: (wallet: Wallet) => void): void;
   on(event: 'disconnected', callback: () => void): void;
-  on(
-    event: 'error',
-    callback: (error: PalisadeIdentitySDK.Error) => void
-  ): void;
+  on(event: 'error', callback: (error: ErrorInfo) => void): void;
   on(
     event: 'transaction-approved',
-    callback: (data: PalisadeIdentitySDK.TransactionApprovedData) => void
+    callback: (data: TransactionApprovedData) => void
   ): void;
   on(event: 'transaction-rejected', callback: () => void): void;
   on(
     event: 'transaction-failed',
-    callback: (data: PalisadeIdentitySDK.TransactionFailedData) => void
+    callback: (data: TransactionFailedData) => void
   ): void;
 
   off(eventName: string): void;
