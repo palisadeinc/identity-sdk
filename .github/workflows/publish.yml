@@ -11,37 +11,41 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Required for OIDC authentication
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '21'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Sync package.json version with the Git tag
+        run: |
+          # Strips the 'v' from the tag (v1.2.3 -> 1.2.3)
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Setting package version to $VERSION"
+          npm version $VERSION --no-git-tag-version
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build package
         run: npm run build
 
-      - name: Set up .npmrc
-        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Publish to npm
         run: |
           if [[ "$GITHUB_REF" == refs/tags/v*-alpha.* ]]; then
-            npm publish --tag alpha
+            npm publish --tag alpha --provenance
           elif [[ "$GITHUB_REF" == refs/tags/v*-beta.* ]]; then
-            npm publish --tag beta
+            npm publish --tag beta --provenance
           elif [[ "$GITHUB_REF" == refs/tags/v*-rc.* ]]; then
-            npm publish --tag rc
+            npm publish --tag rc --provenance
           else
-            npm publish
+            npm publish --provenance
           fi
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
