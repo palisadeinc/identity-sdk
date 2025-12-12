@@ -2,8 +2,16 @@
   "name": "@palisadeinc/identity-sdk",
   "version": "1.2.0",
   "description": "Palisade Identity SDK",
-  "main": "dist/palisade-sdk.min.js",
+  "main": "dist/palisade-sdk.cjs.js",
+  "module": "dist/palisade-sdk.esm.js",
   "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/palisade-sdk.esm.js",
+      "require": "./dist/palisade-sdk.cjs.js"
+    }
+  },
   "files": [
     "dist/",
     "types/",
@@ -12,7 +20,9 @@
     "README.md"
   ],
   "scripts": {
-    "build": "esbuild src/index.js --minify --outfile=dist/palisade-sdk.min.js",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "esbuild src/index.js --bundle --minify --format=cjs --outfile=dist/palisade-sdk.cjs.js",
+    "build:esm": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/palisade-sdk.esm.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "PalisadeInc",
