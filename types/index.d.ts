@@ -24,19 +24,7 @@ export declare class PalisadeIdentitySDK {
   emit(eventName: string, data?: any): void;
 }
 
-export enum Environment {
-  DEVELOPMENT = 'DEVELOPMENT',
-  SANDBOX = 'SANDBOX',
-  PRODUCTION = 'PRODUCTION'
-}
-
-export enum ErrorLevel {
-  SDK = 'SDK',
-  SERVICE = 'SERVICE',
-  UNKNOWN = 'UNKNOWN'
-}
-
-export enum ErrorCode {
+enum ErrorCode {
   // Service-level errors (001-099)
   NO_CLIENT_CONFIG = 'PAL.ERROR.001',
   LOGIN_ERROR = 'PAL.ERROR.002',
@@ -76,6 +64,9 @@ export enum ErrorCode {
   INVALID_TOKEN = 'PAL.ERROR.108',
   INVALID_TRANSACTION_DETAILS = 'PAL.ERROR.109'
 }
+
+type Environment = 'DEVELOPMENT' | 'SANDBOX' | 'PRODUCTION';
+type ErrorLevel = 'SDK' | 'SERVICE' | 'UNKNOWN';
 
 export interface Theme {
   backgroundImageUrl?: string;
