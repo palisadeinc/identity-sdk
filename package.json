@@ -1,6 +1,6 @@
 {
   "name": "@palisadeinc/identity-sdk",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Palisade Identity SDK",
   "main": "dist/palisade-sdk.cjs.js",
   "module": "dist/palisade-sdk.esm.js",

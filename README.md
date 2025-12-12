@@ -59,6 +59,22 @@ or via yarn:
 yarn add @palisadeinc/identity-sdk
 ```
 
+### Module Support
+
+The SDK supports both CommonJS and ES Module formats:
+
+**ES Modules (ESM):**
+
+```javascript
+import { PalisadeIdentitySDK } from '@palisadeinc/identity-sdk';
+```
+
+**CommonJS (CJS):**
+
+```javascript
+const { PalisadeIdentitySDK } = require('@palisadeinc/identity-sdk');
+```
+
 ## Quick Start
 
 Here's a simple example to get you started with the Palisade Identity SDK:
@@ -396,12 +412,21 @@ palisade.on('error', (errorObj: ErrorInfo) => {
 For TypeScript users, error codes are available as an enum with comprehensive error information:
 
 ```typescript
+// ESM
 import {
   PalisadeIdentitySDK,
   ErrorCode,
   ErrorInfo,
   ERROR_INFO
 } from '@palisadeinc/identity-sdk';
+
+// Or CJS
+// const {
+//   PalisadeIdentitySDK,
+//   ErrorCode,
+//   ErrorInfo,
+//   ERROR_INFO
+// } = require('@palisadeinc/identity-sdk');
 
 const palisade = new PalisadeIdentitySDK({
   clientId: 'YOUR_CLIENT_ID'
