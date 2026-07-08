@@ -1,12 +1,14 @@
-# identity-sdk
+# embedded-wallets-sdk
 
-JavaScript SDK for the Palisade Identity app integration, including a demo company integration
+JavaScript SDK for the Palisade Embedded Wallets integration, including a demo company integration
 
 <a id="readme-top"></a>
 
-# Palisade Identity JavaScript SDK
+# Palisade Embedded Wallets JavaScript SDK
 
-Welcome to the **Palisade Identity JavaScript SDK** repository. This SDK enables developers to easily integrate Palisade Identity's authentication and identity management services into their JavaScript applications.
+Welcome to the **Palisade Embedded Wallets JavaScript SDK** repository. This SDK enables developers to easily embed Palisade's authentication, wallet creation and transaction approval flows into their JavaScript applications.
+
+> **Renamed from `@palisadeinc/identity-sdk`.** If you are upgrading, see the [Migration](#migration-from-identity-sdk) section below.
 
 ## Table of Contents
 
@@ -25,15 +27,16 @@ Welcome to the **Palisade Identity JavaScript SDK** repository. This SDK enables
   - [transaction-approved](#transaction-approved)
   - [transaction-rejected](#transaction-rejected)
   - [transaction-failed](#transaction-failed)
+- [Migration from identity-sdk](#migration-from-identity-sdk)
 - [Contact](#contact)
 
 ## Introduction
 
-The **Palisade Identity JavaScript SDK** provides a set of tools and methods to streamline the implementation of authentication, secure wallet creation (via MPC), transaction signing, transaction submission and passkey secured approval in your JavaScript applications.
+The **Palisade Embedded Wallets JavaScript SDK** provides a set of tools and methods to streamline the implementation of authentication, secure wallet creation (via MPC), transaction signing, transaction submission and passkey secured approval in your JavaScript applications.
 
 ## Browser Requirements
 
-The **Palisade Identity JavaScript SDK** makes use of modern browser API's including:
+The **Palisade Embedded Wallets JavaScript SDK** makes use of modern browser API's including:
 
 - [Credential API](https://caniuse.com/mdn-api_credential)
 - [Window API](https://caniuse.com/mdn-api_window_open)
@@ -50,13 +53,13 @@ The **Palisade Identity JavaScript SDK** makes use of modern browser API's inclu
 Install the SDK via npm:
 
 ```bash
-npm install @palisadeinc/identity-sdk
+npm install @palisadeinc/embedded-wallets-sdk
 ```
 
 or via yarn:
 
 ```bash
-yarn add @palisadeinc/identity-sdk
+yarn add @palisadeinc/embedded-wallets-sdk
 ```
 
 ### Module Support
@@ -66,24 +69,24 @@ The SDK supports both CommonJS and ES Module formats:
 **ES Modules (ESM):**
 
 ```javascript
-import { PalisadeIdentitySDK } from '@palisadeinc/identity-sdk';
+import { PalisadeSDK } from '@palisadeinc/embedded-wallets-sdk';
 ```
 
 **CommonJS (CJS):**
 
 ```javascript
-const { PalisadeIdentitySDK } = require('@palisadeinc/identity-sdk');
+const { PalisadeSDK } = require('@palisadeinc/embedded-wallets-sdk');
 ```
 
 ## Quick Start
 
-Here's a simple example to get you started with the Palisade Identity SDK:
+Here's a simple example to get you started with the Palisade Embedded Wallets SDK:
 
 ```javascript
-import { PalisadeIdentitySDK } from '@palisadeinc/identity-sdk';
+import { PalisadeSDK } from '@palisadeinc/embedded-wallets-sdk';
 
 // Initialize the SDK
-const palisade = new PalisadeIdentitySDK({
+const palisade = new PalisadeSDK({
   clientId: 'YOUR_CLIENT_ID',
   iconUrl: 'https://placehold.co/40x40'
 });
@@ -99,9 +102,9 @@ palisade.connect();
 Before using any SDK functions, you must initialize it with your configuration:
 
 ```javascript
-import { PalisadeIdentitySDK } from '@palisadeinc/identity-sdk';
+import { PalisadeSDK } from '@palisadeinc/embedded-wallets-sdk';
 
-const palisade = new PalisadeIdentitySDK({
+const palisade = new PalisadeSDK({
   clientId: 'YOUR_CLIENT_ID',
   iconUrl: 'https://placehold.co/40x40'
 });
@@ -155,7 +158,7 @@ palisade.on('transaction-failed', (data) => {
 **Example:**
 
 ```javascript
-const palisade = new PalisadeIdentitySDK({
+const palisade = new PalisadeSDK({
   clientId: 'YOUR_CLIENT_ID',
   iconUrl: 'https://placehold.co/40x40',
   logoAlt: 'Example Logo',
@@ -385,7 +388,7 @@ These errors are returned by the Palisade Identity service:
 ### Error Handling Example
 
 ```javascript
-import { ErrorInfo } from '@palisadeinc/identity-sdk';
+import { ErrorInfo } from '@palisadeinc/embedded-wallets-sdk';
 
 palisade.on('error', (errorObj: ErrorInfo) => {
   console.log(`Error Level: ${errorObj.level}`);
@@ -414,21 +417,21 @@ For TypeScript users, error codes are available as an enum with comprehensive er
 ```typescript
 // ESM
 import {
-  PalisadeIdentitySDK,
+  PalisadeSDK,
   ErrorCode,
   ErrorInfo,
   ERROR_INFO
-} from '@palisadeinc/identity-sdk';
+} from '@palisadeinc/embedded-wallets-sdk';
 
 // Or CJS
 // const {
-//   PalisadeIdentitySDK,
+//   PalisadeSDK,
 //   ErrorCode,
 //   ErrorInfo,
 //   ERROR_INFO
-// } = require('@palisadeinc/identity-sdk');
+// } = require('@palisadeinc/embedded-wallets-sdk');
 
-const palisade = new PalisadeIdentitySDK({
+const palisade = new PalisadeSDK({
   clientId: 'YOUR_CLIENT_ID'
 });
 
@@ -456,6 +459,23 @@ palisade.on('error', (errorObj: ErrorInfo) => {
   }
 });
 ```
+
+## Migration from identity-sdk
+
+If you are upgrading from `@palisadeinc/identity-sdk`, two things have changed:
+
+1. **The package name.** Install `@palisadeinc/embedded-wallets-sdk` and remove `@palisadeinc/identity-sdk`.
+2. **The class name.** `PalisadeIdentitySDK` has been renamed to `PalisadeSDK`. All methods, events, config fields, error codes, and cookie/wire behaviour are unchanged.
+
+```diff
+- import { PalisadeIdentitySDK } from '@palisadeinc/identity-sdk';
++ import { PalisadeSDK } from '@palisadeinc/embedded-wallets-sdk';
+
+- const palisade = new PalisadeIdentitySDK({ clientId: 'YOUR_CLIENT_ID' });
++ const palisade = new PalisadeSDK({ clientId: 'YOUR_CLIENT_ID' });
+```
+
+For backwards compatibility, `@palisadeinc/identity-sdk` `2.x` is a thin re-export of this package and re-exports the new class under the old name. It prints a deprecation warning at load time; new features and fixes are only published here.
 
 ## Contact
 

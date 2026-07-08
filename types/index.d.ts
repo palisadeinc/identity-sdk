@@ -1,4 +1,4 @@
-export declare class PalisadeIdentitySDK {
+export declare class PalisadeSDK {
   constructor(config: Config);
 
   connect(): void;

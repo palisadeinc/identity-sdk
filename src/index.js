@@ -50,7 +50,7 @@ class EventEmitter {
     emit(eventName, data) {
         if (!this.#isValidEvent(eventName)) {
             throw new Error(
-                `Palisade Identity SDK: There is no event named: ${eventName}`
+                `Palisade SDK: There is no event named: ${eventName}`
             );
         }
 
@@ -69,15 +69,15 @@ class EventEmitter {
     }
 }
 
-export class PalisadeIdentitySDK {
+export class PalisadeSDK {
     static instance;
 
     constructor(clientConfig) {
-        if (PalisadeIdentitySDK.instance) {
-            return PalisadeIdentitySDK.instance;
+        if (PalisadeSDK.instance) {
+            return PalisadeSDK.instance;
         }
 
-        PalisadeIdentitySDK.instance = this;
+        PalisadeSDK.instance = this;
 
         const environmentDomains = {
             development: 'https://identity.development.palisade.co',
@@ -319,10 +319,10 @@ export class PalisadeIdentitySDK {
 
     #utils = {
         closeModal: () => {
-            if (!!PalisadeIdentitySDK.openedWindow) {
+            if (!!PalisadeSDK.openedWindow) {
                 setTimeout(() => {
-                    PalisadeIdentitySDK.openedWindow.close();
-                    PalisadeIdentitySDK.openedWindow = null;
+                    PalisadeSDK.openedWindow.close();
+                    PalisadeSDK.openedWindow = null;
                 }, 500);
             }
         },
@@ -424,7 +424,7 @@ export class PalisadeIdentitySDK {
                             const walletObj = await response.json();
                             this.emit('connected', walletObj);
                             this.isConnected = true;
-                            PalisadeIdentitySDK.instance.wallet = walletObj;
+                            PalisadeSDK.instance.wallet = walletObj;
                         })
                         .catch((error) => {
                             this.isConnected = false;
@@ -494,15 +494,15 @@ export class PalisadeIdentitySDK {
             const url = `${this.sdkConfig.domain}?config=${configEncoded}`;
 
             if (
-                !!PalisadeIdentitySDK.openedWindow &&
-                !PalisadeIdentitySDK.openedWindow.closed
+                !!PalisadeSDK.openedWindow &&
+                !PalisadeSDK.openedWindow.closed
             ) {
-                PalisadeIdentitySDK.openedWindow.location = url;
-                PalisadeIdentitySDK.openedWindow.focus();
+                PalisadeSDK.openedWindow.location = url;
+                PalisadeSDK.openedWindow.focus();
                 return;
             }
 
-            PalisadeIdentitySDK.openedWindow = window.open(
+            PalisadeSDK.openedWindow = window.open(
                 `${this.sdkConfig.domain}?config=${configEncoded}`,
                 this.sdkConfig.modal.title,
                 `left=${left},top=${this.sdkConfig.modal.positionTop},width=${this.sdkConfig.modal.width},height=${this.sdkConfig.modal.height}`
@@ -514,7 +514,7 @@ export class PalisadeIdentitySDK {
             const halfOfModalWidth = parseInt(this.sdkConfig.modal.width) / 2;
             const left = screen.width / 2 - halfOfModalWidth;
 
-            PalisadeIdentitySDK.openedWindow = window.open(
+            PalisadeSDK.openedWindow = window.open(
                 'about:blank',
                 '_blank',
                 `left=${left},top=${this.sdkConfig.modal.positionTop},width=${this.sdkConfig.modal.width},height=${this.sdkConfig.modal.height}`

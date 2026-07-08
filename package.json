@@ -1,7 +1,7 @@
 {
-  "name": "@palisadeinc/identity-sdk",
-  "version": "1.2.3",
-  "description": "Palisade Identity SDK",
+  "name": "@palisadeinc/embedded-wallets-sdk",
+  "version": "2.0.0",
+  "description": "Palisade Embedded Wallets SDK",
   "main": "dist/palisade-sdk.cjs.js",
   "module": "dist/palisade-sdk.esm.js",
   "types": "types/index.d.ts",
@@ -32,12 +32,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/palisadeinc/identity-sdk.git"
+    "url": "git+https://github.com/palisadeinc/embedded-wallets-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/palisadeinc/identity-sdk/issues"
+    "url": "https://github.com/palisadeinc/embedded-wallets-sdk/issues"
   },
-  "homepage": "https://github.com/palisadeinc/identity-sdk#readme",
+  "homepage": "https://github.com/palisadeinc/embedded-wallets-sdk#readme",
   "publishConfig": {
     "access": "public"
   }
