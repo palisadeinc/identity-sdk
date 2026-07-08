@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0] - 2026-07-08
+
+### Changed
+
+- **BREAKING**: Renamed the package from `@palisadeinc/identity-sdk` to `@palisadeinc/embedded-wallets-sdk`.
+- **BREAKING**: Renamed the exported class from `PalisadeIdentitySDK` to `PalisadeSDK`.
+- All methods, events, config fields, error codes, cookie names, and wire behaviour are unchanged.
+
+### Migration
+
+- Install the new package: `npm install @palisadeinc/embedded-wallets-sdk` (and uninstall `@palisadeinc/identity-sdk`).
+- Update imports from `@palisadeinc/identity-sdk` → `@palisadeinc/embedded-wallets-sdk`.
+- Rename `PalisadeIdentitySDK` → `PalisadeSDK` in your code.
+
+For a lower-friction migration, `@palisadeinc/identity-sdk` `2.0.0` has been published as a thin re-export of this package. Existing imports of `PalisadeIdentitySDK` from the old package name continue to work with a deprecation warning; only bug fixes and new features going forward will land in `@palisadeinc/embedded-wallets-sdk`.
+
 ## [1.2.3] - 2025-12-12
 
 ### Updated

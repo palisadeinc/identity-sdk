@@ -1,0 +1,40 @@
+{
+  "name": "@palisadeinc/identity-sdk",
+  "version": "2.0.0",
+  "description": "Deprecated: renamed to @palisadeinc/embedded-wallets-sdk. This package re-exports the new SDK for backwards compatibility.",
+  "main": "index.js",
+  "module": "index.mjs",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.mjs",
+      "require": "./index.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.mjs",
+    "index.d.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "PalisadeInc",
+  "license": "ISC",
+  "dependencies": {
+    "@palisadeinc/embedded-wallets-sdk": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/palisadeinc/embedded-wallets-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/palisadeinc/embedded-wallets-sdk/issues"
+  },
+  "homepage": "https://github.com/palisadeinc/embedded-wallets-sdk#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}
