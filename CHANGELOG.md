@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Documented the `theme` client-config field in `README.md`, including the full themable surface (page background, primary / secondary button fill, border and text colors, and corner radii) and a palette snippet for restoring the Identity UI's pre-rebrand dark look.
+
+### Fixed
+
+- `Theme` in `types/index.d.ts` now matches the Identity UI's accepted shape: added `backgroundColor`, `buttons.primary.{backgroundColor,border,color}`, and `buttons.secondary.{border,color}`, which the UI has always honored but which were missing from the published type.
+
 ## [1.2.3] - 2025-12-12
 
 ### Updated

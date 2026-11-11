@@ -78,11 +78,19 @@ export enum ErrorCode {
 }
 
 export interface Theme {
+  backgroundColor?: string;
   backgroundImageUrl?: string;
   buttons?: {
     borderRadius?: string;
+    primary?: {
+      backgroundColor?: string;
+      border?: string;
+      color?: string;
+    };
     secondary?: {
       backgroundColor?: string;
+      border?: string;
+      color?: string;
     };
   };
   contentBlock?: {

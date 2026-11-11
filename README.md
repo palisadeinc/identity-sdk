@@ -15,6 +15,7 @@ Welcome to the **Palisade Identity JavaScript SDK** repository. This SDK enables
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Usage](#usage)
+- [Theming](#theming)
 - [Methods](#methods)
   - [signTransaction](#sign-transaction)
   - [submitTransaction](#submit-transaction)
@@ -148,6 +149,7 @@ palisade.on('transaction-failed', (data) => {
 | └ isConnectEnabled | boolean | ❌       | true                       | Enables the "Connect" flow for returning users                        |
 | └ isCreateEnabled  | boolean | ❌       | true                       | Enables the "Create" flow for new user registration                   |
 | passkeyName        | string  | ❌       | –                          | Optional pre-defined passkey name in account creation                 |
+| theme              | object  | ❌       | –                          | Optional visual theming — see [Theming](#theming) for the full shape  |
 
 - If both `isConnectEnabled` and `isCreateEnabled` are set to `false`, an error will be thrown.
 - If omitted, both options default to `true`.
@@ -167,6 +169,84 @@ const palisade = new PalisadeIdentitySDK({
   passkeyName: 'YOUR_APP_NAME'
 });
 ```
+
+<a id="theming"></a>
+
+## Theming
+
+The `theme` field on the client config lets you override the page background, the Connect / Create buttons, and the corner radii used across the Identity UI. Values are deep-merged over the default theme, so you only need to specify what you want to change.
+
+### Fields
+
+| Field                              | Type   | Description                                                                |
+| ---------------------------------- | ------ | -------------------------------------------------------------------------- |
+| backgroundColor                    | string | Any CSS color — page background fill                                       |
+| backgroundImageUrl                 | string | Absolute URL to a background image layered over `backgroundColor`          |
+| buttons.borderRadius               | string | CSS length applied to every button (e.g. `'3px'`, `'999px'`)               |
+| buttons.primary.backgroundColor    | string | Fill color of the primary action button (e.g. "Connect a wallet")          |
+| buttons.primary.border             | string | CSS `border` shorthand for the primary button (e.g. `'1px solid #FBFCFD'`) |
+| buttons.primary.color              | string | Text color on the primary button                                           |
+| buttons.secondary.backgroundColor  | string | Fill color of the secondary button                                         |
+| buttons.secondary.border           | string | CSS `border` shorthand for the secondary button                            |
+| buttons.secondary.color            | string | Text color on the secondary button                                         |
+| contentBlock.borderRadius          | string | CSS length applied to content cards / panels                               |
+| inputs.borderRadius                | string | CSS length applied to text inputs                                          |
+
+- `backgroundImageUrl` must be an absolute URL reachable from the user's browser; relative paths will 404 because the Identity UI serves the config from its own origin, not yours.
+- Text colors elsewhere on the page (headings, body copy, footer) are not themeable today and remain locked to the default palette — pick a `backgroundColor` with enough contrast against mid-gray text.
+- Nested objects are deep-merged, so `theme: { buttons: { primary: { backgroundColor: '#000' } } }` keeps every other button field at its default.
+
+### Example
+
+```javascript
+const palisade = new PalisadeIdentitySDK({
+  clientId: 'YOUR_CLIENT_ID',
+  theme: {
+    backgroundColor: '#0E1A2B',
+    buttons: {
+      borderRadius: '6px',
+      primary: {
+        backgroundColor: '#8BE05F',
+        border: '1px solid #8BE05F',
+        color: '#001B2E'
+      },
+      secondary: {
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        color: '#FFFFFF'
+      }
+    }
+  }
+});
+```
+
+### Restoring the pre-rebrand palette
+
+The Identity UI used to ship a dark-surface theme by default. That surface was replaced with a light Ripple Custody look in a recent Identity UI rebrand; the SDK surface is unchanged, but the visual default integrators see in the browser is now the new palette. To restore the previous dark look, pass:
+
+```json
+{
+  "theme": {
+    "backgroundColor": "#183142",
+    "buttons": {
+      "borderRadius": "3px",
+      "primary": {
+        "backgroundColor": "#FFFFFF",
+        "border": "1px solid #FBFCFD",
+        "color": "#183142"
+      },
+      "secondary": {
+        "backgroundColor": "rgba(255, 255, 255, 0.05)",
+        "border": "none",
+        "color": "#FFFFFF"
+      }
+    },
+    "contentBlock": { "borderRadius": "6px" },
+    "inputs": { "borderRadius": "3px" }
+  }
+}
+```
+
+The original dark surface was an SVG pattern (`backgroundImageUrl: './images/background-pattern.svg'`) bundled inside the Identity UI; that asset was removed in the rebrand, so the snippet above substitutes the matching flat `backgroundColor` (`#183142`, the old `gray800` token). If you want the exact pattern back, host the SVG at a public URL and set `backgroundImageUrl` to that absolute URL instead.
 
 # Methods
 
